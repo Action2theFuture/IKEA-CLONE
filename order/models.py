@@ -1,7 +1,7 @@
-from django.db import models
+from django.db      import models
 
 from product.models import Product
-from user.models import User
+from user.models    import User
 
 class Order(models.Model):
     first_name   = models.CharField(max_length=32, default="")
@@ -10,7 +10,7 @@ class Order(models.Model):
     sub_address  = models.CharField(max_length=128, default="")
     user         = models.ForeignKey(User, on_delete=models.CASCADE)
     status       = models.ForeignKey("OrderStatus", default=1 ,on_delete=models.CASCADE)
-    order_list   = models.ManyToManyField(Product, through="OrderList")
+    order_list   = models.ManyToManyField(Product, through="OrderList", related_name='order')
     
     class Meta:
         db_table = "orders"

@@ -1,5 +1,4 @@
 from django.db import models
-from product.models import Product 
 
 class User(models.Model):
     email        = models.EmailField(max_length=128, unique=True)
@@ -10,14 +9,14 @@ class User(models.Model):
     birthday     = models.CharField(max_length=32)
     create_at    = models.DateTimeField(auto_now_add=True)
     update_at    = models.DateTimeField(auto_now=True)
-    wish_list    = models.ManyToManyField(Product, through="WishList")
-    
+    wish_list    = models.ManyToManyField("product.Product", through="WishList")
+
     class Meta:
         db_table = "users"
 
 class WishList(models.Model):
     user         = models.ForeignKey("User", on_delete=models.CASCADE)
-    product      = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product      = models.ForeignKey("product.Product", on_delete=models.CASCADE)
     
     class Meta:
         db_table = "wish_list"
