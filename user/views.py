@@ -4,7 +4,7 @@ from django.views import View
 from django.http  import HttpResponse, JsonResponse
 from user.models  import User
 
-from my_settings import SECRET, ALGORITHM
+from wikea.settings import SECRET_KEY
 
 class LogIn(View):
     def post(self, request):
@@ -19,11 +19,11 @@ class LogIn(View):
             user            = User.objects.get(email=log_email)
             user_password   = user.password.encode('utf-8')
 
-            if not bcrypt.checkpw(user_password, log_password):
+            if not bcrypt.checkpw(log_password, user_password):
                 return JsonResponse({"MASSAGE": "INVALID_USER"}, status=401)
 
             data         = {'user_id':user.id}
-            access_token = jwt.encode(data, SECRET, algorithm=ALGORITHM)   
+            access_token = jwt.encode(data, SECRET_KEY, algorithm='HS256')   
             return JsonResponse({'token':access_token}, status=200)
 
         except KeyError:
