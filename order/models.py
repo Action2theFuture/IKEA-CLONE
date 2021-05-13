@@ -16,15 +16,15 @@ class Order(models.Model):
         db_table = "orders"
 
 class OrderStatus(models.Model):
-    status       = models.CharField(max_length=32)
+    status = models.CharField(max_length=32)
     
     class Meta:
         db_table = "order_status"
 
 class OrderList(models.Model):
-    quantity     = models.IntegerField(default=1)
-    order        = models.ForeignKey("Order", on_delete=models.CASCADE)
-    product      = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    order    = models.ForeignKey("Order", on_delete=models.CASCADE)
+    product  = models.ForeignKey(Product, on_delete=models.CASCADE)
     
     class Meta:
         db_table = "order_lists"
