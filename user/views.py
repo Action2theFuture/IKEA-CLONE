@@ -8,6 +8,7 @@ from django.views   import View
 from wikea.settings import SECRET_KEY
 from my_settings    import ALGORITHM
 from user.models    import User
+from user.validate  import validate_email, validate_password
 
 class SignupView(View):
     def post(self, request):
@@ -18,13 +19,22 @@ class SignupView(View):
             email           = data['email']
             birthday        = data['birthday']
             phone_number    = data['phone_number']
-            hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'),bcrypt.gensalt()).decode('utf-8')
-            
+            password        = data['password']
 
+            if not validate_email(email):
+                return JsonResponse({'message':'IMVALID EMAIL'}, status=400)
+            
+            if not validate_password(password):
+                return JsonResponse({'message':'IMVALID PASSWORD'}, status=400)
+            
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt()).decode('utf-8')
+            
             if User.objects.filter(first_name = first_name, last_name = last_name).exists():
                 return JsonResponse({'message':'DUPLICATE NAME'}, status=409)
+
             if User.objects.filter(email = email).exists():
                 return JsonResponse({'message':'DUPLICATE EMAIL'}, status=409)
+
             if User.objects.filter(phone_number = phone_number).exists():
                 return JsonResponse({'message':'DUPLICATE PHONE_NUMBER'}, status=409)
             
