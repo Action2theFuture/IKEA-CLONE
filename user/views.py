@@ -3,7 +3,7 @@ import json, bcrypt, jwt
 from django.views import View
 from django.http  import JsonResponse
 
-from user.models  import User
+from user.models    import User
 from wikea.settings import SECRET_KEY
 
 class LogIn(View):
@@ -24,7 +24,7 @@ class LogIn(View):
 
             data         = {'user_id':user.id}
             access_token = jwt.encode(data, SECRET_KEY, algorithm='HS256')   
-            return JsonResponse({'token':access_token, 'user_id':jwt.decode(access_token, SECRET_KEY, algorithms='HS256')}, status=200)
+            return JsonResponse({'token':access_token}, status=200)
 
         except KeyError:
-            return JsonResponse({'MASSAGE':'KEYERROR'}, status=401)
+            return JsonResponse({'MASSAGE':'KEYERROR'}, status=400)
