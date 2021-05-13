@@ -6,7 +6,6 @@ from django.http    import JsonResponse
 from django.views   import View
 
 from wikea.settings import SECRET_KEY
-from my_settings    import ALGORITHM
 from user.models    import User
 from user.validate  import validate_email, validate_password
 
@@ -14,12 +13,12 @@ class SignupView(View):
     def post(self, request):
         data = json.loads(request.body)
         try:
-            first_name      = data['first_name']
-            last_name       = data['last_name']
-            email           = data['email']
-            birthday        = data['birthday']
-            phone_number    = data['phone_number']
-            password        = data['password']
+            first_name   = data['first_name']
+            last_name    = data['last_name']
+            email        = data['email']
+            birthday     = data['birthday']
+            phone_number = data['phone_number']
+            password     = data['password']
 
             if not validate_email(email):
                 return JsonResponse({'message':'IMVALID EMAIL'}, status=400)
