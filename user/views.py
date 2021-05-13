@@ -1,8 +1,8 @@
 import json, bcrypt, jwt
 
 from django.views import View
-from django.http import HttpResponse, JsonResponse
-from user.models import User
+from django.http  import HttpResponse, JsonResponse
+from user.models  import User
 
 from my_settings import SECRET, ALGORITHM
 
@@ -10,14 +10,16 @@ class LogIn(View):
     def post(self, request):
         data = json.loads(request.body)
         try:
-            password        = data['password']
-            user            = User.objects.get(email=data['email'])
-            hashed_password = user.password.encode('utf-8')
+            log_email    = data['email']
+            log_password = data['password'].encode('utf-8')
 
-            if not User.objects.filter(email=data['email']).exists():
+            if not User.objects.filter(email=log_email).exists():
                 return JsonResponse({"MESSAGE": "INVALID_USER"}, status=401)
 
-            if not bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+            user            = User.objects.get(email=log_email)
+            user_password   = user.password.encode('utf-8')
+
+            if not bcrypt.checkpw(user_password, log_password):
                 return JsonResponse({"MASSAGE": "INVALID_USER"}, status=401)
 
             data         = {'user_id':user.id}
