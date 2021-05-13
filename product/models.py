@@ -2,7 +2,9 @@ from django.db              import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Product(models.Model):
-    name          = models.CharField(max_length=128)
+    ko_name   = models.CharField(max_length=128)
+    en_name  = models.CharField(max_length=128)
+    stock         = models.IntegerField(default=0)
     price         = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     special_price = models.DecimalField(max_digits=10, decimal_places=2, default=None)
     is_new        = models.BooleanField(default=False)
@@ -16,19 +18,22 @@ class Product(models.Model):
         db_table = "products"
 
 class Series(models.Model):
-    name = models.CharField(max_length=64)
-    
+    ko_name   = models.CharField(max_length=64)
+    en_name  = models.CharField(max_length=64)
+
     class Meta:
         db_table = "series"
 
 class Category(models.Model):
-    name     = models.CharField(max_length=64)
+    ko_name   = models.CharField(max_length=64)
+    en_name  = models.CharField(max_length=64)
 
     class Meta:
         db_table = "category"
 
 class SubCategory(models.Model):
-    name     = models.CharField(max_length=64)
+    ko_name   = models.CharField(max_length=64)
+    en_name  = models.CharField(max_length=64)
     category = models.ForeignKey("Category", on_delete=models.CASCADE)
     
     class Meta:
@@ -44,7 +49,8 @@ class Comment(models.Model):
         db_table = "comments"
 
 class Color(models.Model):
-    name  = models.CharField(max_length=32)
+    ko_name  = models.CharField(max_length=32)
+    en_name  = models.CharField(max_length=32)
     
     class Meta:
         db_table = "colors"
