@@ -15,8 +15,8 @@ class User(models.Model):
         db_table = "users"
 
 class WishList(models.Model):
-    user         = models.ForeignKey("User", on_delete=models.CASCADE)
-    product      = models.ForeignKey("product.Product", on_delete=models.CASCADE)
+    user    = models.ForeignKey("User", on_delete=models.CASCADE)
+    product = models.ForeignKey("product.Product", on_delete=models.CASCADE)
     
     class Meta:
         db_table = "wish_list"
