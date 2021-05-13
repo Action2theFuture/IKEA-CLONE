@@ -2,6 +2,7 @@ from django.db              import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Product(models.Model):
+    name          = models.CharField(max_length=128)
     price         = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     special_price = models.DecimalField(max_digits=10, decimal_places=2, default=None)
     is_new        = models.BooleanField(default=False)
