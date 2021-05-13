@@ -1,9 +1,9 @@
 import jwt
 
-from django.http  import JsonResponse
+from django.http            import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 
-from user.models import User
+from user.models    import User
 from wikea.settings import SECRET_KEY
 
 def authorize(func):
