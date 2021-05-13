@@ -1,6 +1,6 @@
 import jwt
 
-from django.http  import HttpResponse, JsonResponse
+from django.http  import JsonResponse
 
 from user.models import User
 from wikea.settings import SECRET_KEY
