@@ -14,14 +14,14 @@ def authorize(func):
             user         = User.objects.get(id=payload['user_id'])
             request.user = user
         
+            if not access_token:
+                return JsonResponse({'message':'KEY_ERROR'}, status=400)
+
         except jwt.exceptions.DecodeError:
             return JsonResponse({'message':'INVALID_TOKEN' }, status=400)
 
         except Account.DoesNotExist:
             return JsonResponse({'message':'INVALID_USER'}, status=400)
-        
-        except KeyError:
-            return JsonResponse({'message':'KEY_ERROR'}, status=400)
 
         return func(self, request, *args, **kwargs)
 
