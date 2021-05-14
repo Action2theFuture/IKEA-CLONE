@@ -8,11 +8,12 @@ from product.models import *
 
 
 class MainView(View):
-    def get(self, request):
+    def post(self, request):
+        data = json.loads(request.body)
         categorys         = Category.objects.all().values('english_name')
         all_category      = {}
         recommend_product = []
-
+        new_products      = {}
         for category in categorys:
             category_name = category['english_name']
             sub_categorys = list(SubCategory.objects.filter(category=Category.objects.get(english_name=category_name)).values())  
@@ -28,5 +29,7 @@ class MainView(View):
                 'korean_name',
                 'price'
             )))
-       
+        
+        
+
         return JsonResponse({'category':all_category,'recommended':recommend_product}, status=200)
