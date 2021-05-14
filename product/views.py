@@ -1,4 +1,5 @@
 import json
+import random
 
 from django.views               import View
 from django.http                import JsonResponse, HttpResponse
@@ -6,21 +7,39 @@ from django.db.models.functions import Lower
 from django.core.exceptions     import ValidationError
 from product.models             import Product, Category, SubCategory, Color, Description, ProductColor, Image, Series
 
-class ProductMainView(View):
+
+
+class MainView(View):
     def get(self, request):
-        category_values = Category.objects.all().values()
-        beds            = Category.objects.get(english_name="beds")
-        beds_values     = SubCategory.objects.filter(category=beds).values()
-        lamps           = Category.objects.get(english_name="lamps")
-        lamps_values    = SubCategory.objects.filter(category=lamps).values()
-        storages        = Category.objects.get(english_name="storages")
-        storages_values = SubCategory.objects.filter(category=storages).values()
-               
-        return JsonResponse({
-            'category':list(category_values), 
-            'bed':list(beds_values), 
-            'lighting':list(lamps_values), 
-            'bookcase':list(storages_values)}, status=200)
+        categorys         = Category.objects.all().values('english_name')
+        all_category      = {}
+        recommend_product = []
+        new_products      = {}
+        for category in categorys:
+            category_name               = category['english_name']
+            sub_categorys               = list(SubCategory.objects.filter(category=Category.objects.get(english_name=category_name)).values())  
+            all_category[category_name] = [s['english_name'] for s in sub_categorys]
+        
+        r = random.randrange(1,Category.objects.count()+1)
+
+        recommend_category = Category.objects.get(id=r)
+        sub_categorys      = SubCategory.objects.filter(category=recommend_category)
+
+        for sub_category in sub_categorys:
+            for product in list(Product.objects.filter(sub_category=sub_category)):
+                product_information = {
+                    'is_new'       : product.is_new,
+                    'english_name' : product.english_name,
+                    'korean_name'  : product.korean_name,
+                    'price'        : product.price
+                }
+                recommend_product.append(
+                    product_information
+                )
+        
+        
+
+        return JsonResponse({'category':all_category,'recommended':recommend_product}, status=200)
 
 class SubCategoryView(View):
     def get(self, request, category_name):
@@ -93,4 +112,3 @@ class FilterSortView(View):
 
         except Product.DoesNotExist as e:
             return JsonResponse({'MASSAGE':f'{e}'}, status=404)
-            
