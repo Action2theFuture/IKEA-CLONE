@@ -8,17 +8,12 @@ from product.models import *
 
 class MainView(View):
     def get(self, request):
-        categorys      = Category.objects.all()
-        category_names = categorys.values('english_name')
-        print(list(category_names))
-
-
-        new_products = {}
-        products = Product.objects.all()
+        categorys = Category.objects.all().values('english_name')
+        all_category = {}
         for category in categorys:
-            category_name = category.english_name
-            sub_categorys = SubCategory.objects.filter(category = category)
-            new_products[category_name] = []
+            category_name = category['english_name']
+            sub_categorys = list(SubCategory.objects.filter(category=Category.objects.get(english_name=category_name)).values())
             for sub_category in sub_categorys:
-                new_products[category_name].append(list(Product.objects.filter(sub_category=sub_category, is_new=True).values('english_name')))
-        return JsonResponse({'category':list(category_names), 'new_products':new_products}, status=200)
+                all_category[category_name] = [s['english_name'] for s in sub_categorys]
+        
+        return JsonResponse({'category':all_category}, status=200)
