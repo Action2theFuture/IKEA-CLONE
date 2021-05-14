@@ -2,8 +2,8 @@ from django.db              import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Product(models.Model):
-    ko_name   = models.CharField(max_length=128)
-    en_name  = models.CharField(max_length=128)
+    ko_name       = models.CharField(max_length=128)
+    en_name       = models.CharField(max_length=128)
     stock         = models.IntegerField(default=0)
     price         = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     special_price = models.DecimalField(max_digits=10, decimal_places=2, default=None)
@@ -19,22 +19,22 @@ class Product(models.Model):
 
 class Series(models.Model):
     ko_name   = models.CharField(max_length=64)
-    en_name  = models.CharField(max_length=64)
+    en_name   = models.CharField(max_length=64)
 
     class Meta:
         db_table = "series"
 
 class Category(models.Model):
     ko_name   = models.CharField(max_length=64)
-    en_name  = models.CharField(max_length=64)
+    en_name   = models.CharField(max_length=64)
 
     class Meta:
         db_table = "category"
 
 class SubCategory(models.Model):
     ko_name   = models.CharField(max_length=64)
-    en_name  = models.CharField(max_length=64)
-    category = models.ForeignKey("Category", on_delete=models.CASCADE)
+    en_name   = models.CharField(max_length=64)
+    category  = models.ForeignKey("Category", on_delete=models.CASCADE)
     
     class Meta:
         db_table = "sub_category"
