@@ -1,10 +1,10 @@
 import json
 
-from django.views   import View
-from django.http    import JsonResponse, HttpResponse
+from django.views               import View
+from django.http                import JsonResponse, HttpResponse
 from django.db.models.functions import Lower
-from django.core.exceptions import ValidationError
-from product.models import Product, Category, SubCategory, Color, Description, ProductColor, Image, Series
+from django.core.exceptions     import ValidationError
+from product.models             import Product, Category, SubCategory, Color, Description, ProductColor, Image, Series
 
 class ProductMainView(View):
     def get(self, request):
