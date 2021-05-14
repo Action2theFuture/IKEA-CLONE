@@ -10,56 +10,62 @@ from product.models import Product, Category, SubCategory, Color, Description, P
 
 class MainView(View):
     def get(self, request):
-        categorys         = Category.objects.all().values('english_name')
-        all_category      = {}
-        recommend_product = []
-        new_products      = []
-        for category in categorys:
-            category_name               = category['english_name']
-            sub_categorys               = list(SubCategory.objects.filter(category=Category.objects.get(english_name=category_name)).values())  
-            all_category[category_name] = [s['english_name'] for s in sub_categorys]
-        
-        r = random.randrange(1,Category.objects.count()+1)
+        try:
+            categorys         = Category.objects.all().values('english_name')
+            all_category      = {} # 카테고리, 세부 카테고리
+            recommend_product = [] # 추천 상품
+            new_products      = [] # 신상품
+            # 카테고리, 세부 카테고리
+            for category in categorys:
+                category_name               = category['english_name']
+                sub_categorys               = list(SubCategory.objects.filter(category=Category.objects.get(english_name=category_name)).values())  
+                all_category[category_name] = [s['english_name'] for s in sub_categorys]
+            # 추천 상품
+            r = random.randrange(1,Category.objects.count()+1)
 
-        recommend_category = Category.objects.get(id=r)
-        sub_categorys      = SubCategory.objects.filter(category=recommend_category)
+            recommend_category = Category.objects.get(id=r)
+            sub_categorys      = SubCategory.objects.filter(category=recommend_category)
 
-        for sub_category in sub_categorys:
-            for product in list(Product.objects.filter(sub_category=sub_category)):
-                product_information = {
-                    'is_new'       : product.is_new,
-                    'english_name' : product.english_name,
-                    'korean_name'  : product.korean_name,
-                    'price'        : product.price
+            for sub_category in sub_categorys:
+                for product in list(Product.objects.filter(sub_category=sub_category)):
+                    product_information = {
+                        'is_new'       : product.is_new,
+                        'english_name' : product.english_name,
+                        'korean_name'  : product.korean_name,
+                        'price'        : product.price
+                    }
+                    recommend_product.append(
+                        product_information
+                    )
+            # 신상품
+            left_image_lamp = Product.objects.get(english_name="nikelamp")
+            left_image_bed = Product.objects.get(english_name="nikebed")
+            left_image_storage = Product.objects.get(english_name="nikestorage")
+            new_products = [{
+                'lamp' : {
+                    'is_new' : left_image_lamp.is_new,
+                    'english_name' : left_image_lamp.english_name,
+                    'korean_name' : left_image_lamp.korean_name,
+                    'price'       : left_image_lamp.price
+                },
+                'bed' : {
+                    'is_new' : left_image_bed.is_new,
+                    'english_name' : left_image_bed.english_name,
+                    'korean_name' : left_image_bed.korean_name,
+                    'price'       : left_image_bed.price
+                },
+                'storage' : {
+                    'is_new' : left_image_storage.is_new,
+                    'english_name' : left_image_storage.english_name,
+                    'korean_name' : left_image_storage.korean_name,
+                    'price'       : left_image_storage.price
                 }
-                recommend_product.append(
-                    product_information
-                )
-        left_image_lamp = Product.objects.get(english_name="nikelamp")
-        left_image_bed = Product.objects.get(english_name="nikebed")
-        left_image_storage = Product.objects.get(english_name="nikestorage")
-        new_products = [{
-            'lamp' : {
-                'is_new' : left_image_lamp.is_new,
-                'english_name' : left_image_lamp.english_name,
-                'korean_name' : left_image_lamp.korean_name,
-                'price'       : left_image_lamp.price
-            },
-            'bed' : {
-                'is_new' : left_image_bed.is_new,
-                'english_name' : left_image_bed.english_name,
-                'korean_name' : left_image_bed.korean_name,
-                'price'       : left_image_bed.price
-            },
-            'storage' : {
-                'is_new' : left_image_storage.is_new,
-                'english_name' : left_image_storage.english_name,
-                'korean_name' : left_image_storage.korean_name,
-                'price'       : left_image_storage.price
-            }
-        }]
-
-        return JsonResponse({'category':all_category,'recommended':recommend_product, 'new_products':new_products}, status=200)
+            }]
+            return JsonResponse({'category':all_category,'recommended':recommend_product, 'new_products':new_products}, status=200)
+            
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
+        
 
 class SubCategoryView(View):
     def get(self, request, category_name):
