@@ -8,15 +8,12 @@ from django.core.exceptions     import ValidationError
 
 from product.models import Product, Category, SubCategory, Color, Description, ProductColor, Image, Series
 
-
-
 class MainView(View):
     def get(self, request):
-        
         categorys         = Category.objects.all().values('english_name')
         all_category      = {}
         recommend_product = []
-        new_products      = {}
+        new_products      = []
         for category in categorys:
             category_name               = category['english_name']
             sub_categorys               = list(SubCategory.objects.filter(category=Category.objects.get(english_name=category_name)).values())  
@@ -38,10 +35,31 @@ class MainView(View):
                 recommend_product.append(
                     product_information
                 )
-        
-        
+        left_image_lamp = Product.objects.get(english_name="nikelamp")
+        left_image_bed = Product.objects.get(english_name="nikebed")
+        left_image_storage = Product.objects.get(english_name="nikestorage")
+        new_products = [{
+            'lamp' : {
+                'is_new' : left_image_lamp.is_new,
+                'english_name' : left_image_lamp.english_name,
+                'korean_name' : left_image_lamp.korean_name,
+                'price'       : left_image_lamp.price
+            },
+            'bed' : {
+                'is_new' : left_image_bed.is_new,
+                'english_name' : left_image_bed.english_name,
+                'korean_name' : left_image_bed.korean_name,
+                'price'       : left_image_bed.price
+            },
+            'storage' : {
+                'is_new' : left_image_storage.is_new,
+                'english_name' : left_image_storage.english_name,
+                'korean_name' : left_image_storage.korean_name,
+                'price'       : left_image_storage.price
+            }
+        }]
 
-        return JsonResponse({'category':all_category,'recommended':recommend_product}, status=200)
+        return JsonResponse({'category':all_category,'recommended':recommend_product, 'new_products':new_products}, status=200)
 
 class SubCategoryView(View):
     def get(self, request, category_name):
