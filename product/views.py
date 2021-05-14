@@ -7,7 +7,7 @@ from django.views import View
 from product.models import *
 
 
-class Main(View):
+class MainView(View):
     def get(self, request):
         
         categorys         = Category.objects.all().values('english_name')

@@ -34,7 +34,7 @@ class Category(models.Model):
 class SubCategory(models.Model):
     korean_name  = models.CharField(max_length=64)
     english_name = models.CharField(max_length=64)
-    category = models.ForeignKey("Category", on_delete=models.CASCADE)
+    category     = models.ForeignKey("Category", on_delete=models.CASCADE)
     
     class Meta:
         db_table = "sub_category"
