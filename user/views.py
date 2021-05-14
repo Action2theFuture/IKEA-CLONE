@@ -26,8 +26,6 @@ class SignupView(View):
             if not validate_password(password):
                 return JsonResponse({'message':'IMVALID PASSWORD'}, status=400)
             
-            hashed_password = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt()).decode('utf-8')
-            
             if User.objects.filter(first_name = first_name, last_name = last_name).exists():
                 return JsonResponse({'message':'DUPLICATE NAME'}, status=400)
 
@@ -36,14 +34,14 @@ class SignupView(View):
 
             if User.objects.filter(phone_number = phone_number).exists():
                 return JsonResponse({'message':'DUPLICATE PHONE_NUMBER'}, status=400)
-            
+
             User.objects.create(
                 first_name   = first_name,
                 last_name    = last_name,
                 email        = email,
                 birthday     = birthday,
                 phone_number = phone_number,
-                password     = hashed_password
+                password     = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt()).decode('utf-8')
             )
             return JsonResponse({'message':'SUCCESS'}, status=200)
         except KeyError:
