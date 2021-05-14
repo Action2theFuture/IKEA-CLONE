@@ -9,11 +9,11 @@ from product.models             import Product, Category, SubCategory, Color, De
 class ProductMainView(View):
     def get(self, request):
         category_values = Category.objects.all().values()
-        beds            = Category.objects.get(en_name="beds")
+        beds            = Category.objects.get(english_name="beds")
         beds_values     = SubCategory.objects.filter(category=beds).values()
-        lamps           = Category.objects.get(en_name="lamps")
+        lamps           = Category.objects.get(english_name="lamps")
         lamps_values    = SubCategory.objects.filter(category=lamps).values()
-        storages        = Category.objects.get(en_name="storages")
+        storages        = Category.objects.get(english_name="storages")
         storages_values = SubCategory.objects.filter(category=storages).values()
                
         return JsonResponse({
@@ -24,8 +24,8 @@ class ProductMainView(View):
 
 class SubCategoryView(View):
     def get(self, request, category_name):
-        if Category.objects.filter(en_name=category_name).exists():
-            category = Category.objects.get(en_name=category_name)
+        if Category.objects.filter(english_name=category_name).exists():
+            category = Category.objects.get(english_name=category_name)
             result   = SubCategory.objects.filter(category=category).values()
 
             return JsonResponse({'result':list(result)}, status=200)
@@ -33,23 +33,23 @@ class SubCategoryView(View):
 
 class ProductListView(View):
     def get(self, request, sub_category_name):
-        if SubCategory.objects.filter(en_name=sub_category_name).exists():
-            sub_category = SubCategory.objects.get(en_name=sub_category_name)
+        if SubCategory.objects.filter(english_name=sub_category_name).exists():
+            sub_category = SubCategory.objects.get(english_name=sub_category_name)
             product_id   = Product.objects.get(sub_category=sub_category)
-            series       = product_id.series.en_name
+            series       = product_id.series.english_name
             products     = Product.objects.filter(sub_category=sub_category)
 
             product_list = []
             for product in products:
                 product_list.append(
                     {
-                        'ko_name'          : product.ko_name,
-                        'en_name'          : product.en_name,
+                        'ko_name'          : product.korean_name,
+                        'en_name'          : product.english_name,
                         'price'            : product.price,
                         'special_price'    : product.special_price,
                         'is_new'           : product.is_new,
                         'color_list'       : [color.name for color in product.color.all()],
-                        'sub_category_name': sub_category.ko_name,
+                        'sub_category_name': sub_category.korean_name,
                         # 'image'            : Image.objects.get(product=product_id).url
                     }
                 )
@@ -59,9 +59,9 @@ class ProductListView(View):
 
 class ProductDetailView(View):
     def get(self ,request, product_name):
-        if Product.objects.filter(en_name=product_name).exists():
-            product            = Product.objects.filter(en_name=product_name).values()
-            product_id         = Product.objects.get(en_name=product_name)
+        if Product.objects.filter(english_name=product_name).exists():
+            product            = Product.objects.filter(english_name=product_name).values()
+            product_id         = Product.objects.get(english_name=product_name)
             descriptions       = Description.objects.filter(product=product_id).values()
             #color_list         = [color.name for color in product.color.all()]
             #images             = Image.objects.get(product=product).url
