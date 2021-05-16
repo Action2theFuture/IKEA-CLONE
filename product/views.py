@@ -13,6 +13,7 @@ class MainView(View):
         try:
             # 카테고리, 세부 카테고리
             category_list = []
+            sub_category_list = {}
             categorys     = Category.objects.all()
             for category in categorys:
                 sub_categorys = list(SubCategory.objects.filter(category=category))
@@ -20,17 +21,18 @@ class MainView(View):
                     {
                         'id'          : category.id,
                         'korean_name' : category.korean_name,
-                        'english_name': category.english_name,
-                        'sub_category': [
-                                {
-                                    'id'          : s.id,
-                                    'korean_name' : s.korean_name,
-                                    'english_name': s.english_name
-                                } 
-                                for s in sub_categorys
-                            ]
+                        'english_name': category.english_name
                     }
                 )
+                sub_category_list[category.english_name] = [
+                    {
+                        'id'          : s.id,
+                        'korean_name' : s.korean_name,
+                        'english_name': s.english_name
+                    } 
+                    for s in sub_categorys
+                ]
+                
             
             # 추천 상품
             recommend_product  = []
@@ -100,7 +102,7 @@ class MainView(View):
                 }
             ]
             
-            return JsonResponse({'category_list':category_list,'recommended':recommend_product, 'new_products':new_products}, status=200)
+            return JsonResponse({'category_list':category_list,'sub_category_list':sub_category_list,'recommended':recommend_product, 'new_products':new_products}, status=200)
             
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
