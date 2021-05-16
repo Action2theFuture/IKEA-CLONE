@@ -34,8 +34,8 @@ class MainView(View):
             
             # 추천 상품
             recommend_product  = []
-            random_nember      = random.randrange(1,Category.objects.count()+1)
-            recommend_category = Category.objects.get(id=random_nember)
+            random_number      = random.randrange(1,Category.objects.count()+1)
+            recommend_category = Category.objects.get(id=random_number)
             sub_categorys      = SubCategory.objects.filter(category=recommend_category)
 
             for sub_category in sub_categorys:
@@ -126,12 +126,12 @@ class ProductListView(View):
             for product in products:
                 product_list.append(
                     {
-                        'korean_name'          : product.ko_name,
-                        'english_name'          : product.english_name,
-                        'price'            : product.price,
-                        'special_price'    : product.special_price,
-                        'is_new'           : product.is_new,
-                        'color_list'       : [color.name for color in product.color.all()],
+                        'korean_name'       : product.ko_name,
+                        'english_name'      : product.english_name,
+                        'price'             : product.price,
+                        'special_price'     : product.special_price,
+                        'is_new'            : product.is_new,
+                        'color_list'        : [color.name for color in product.color.all()],
                         'sub_cat-egory_name': sub_category.ko_name,
                         # 'image'            : Image.objects.get(product=product_id).url
                         'star':2
@@ -149,6 +149,11 @@ class ProductDetailView(View):
             descriptions       = Description.objects.filter(product=product_id).values()
             #color_list         = [color.name for color in product.color.all()]
             #images             = Image.objects.get(product=product).url
+
+            random_number         = random.randrange(1,SubCategory.objects.count()+1)
+            recommend_subcategory = SubCategory.objects.get(id=random_number)
+            recommend_products    = Product.objects.filter(sub_category=recommend_subcategory).values()
+
             product_list = []
             product_list.append(
                 {
@@ -161,7 +166,9 @@ class ProductDetailView(View):
                     'descriptions':list(descriptions),
                 },
             )
+
             return JsonResponse({'product': product_list,
+            'recommend_list': list(recommend_products)
             #'color':color_list, 
             #'images':list(images)
             }, status=200)
@@ -186,6 +193,6 @@ class FilterSortView(View):
 
         except Product.DoesNotExist as e:
             return JsonResponse({'MASSAGE':f'{e}'}, status=404)
-            
+
         except ValidationError as e:
             return JsonResponse({'MASSAGE':f'{e}'}, status=404)
