@@ -134,6 +134,7 @@ class ProductListView(View):
                         'color_list'       : [color.name for color in product.color.all()],
                         'sub_cat-egory_name': sub_category.ko_name,
                         # 'image'            : Image.objects.get(product=product_id).url
+                        'star':2
                     }
                 )
 
@@ -148,13 +149,22 @@ class ProductDetailView(View):
             descriptions       = Description.objects.filter(product=product_id).values()
             #color_list         = [color.name for color in product.color.all()]
             #images             = Image.objects.get(product=product).url
-
-            return JsonResponse({
-                'product':list(product),
-                #'color':color_list, 
-                'descriptions':list(descriptions),
-                #'images':list(images),
-                }, status=200)
+            product_list = []
+            product_list.append(
+                {
+                    'id':product_id.id,
+                    'korean_name':product_id.korean_name,
+                    'english_name':product_id.english_name,
+                    'stock':product_id.stock,
+                    'is_new':product_id.is_new,
+                    'url':'url',
+                    'descriptions':list(descriptions),
+                },
+            )
+            return JsonResponse({'product': product_list,
+            #'color':color_list, 
+            #'images':list(images)
+            }, status=200)
         return JsonResponse({'MASSAGE':'Non-existent Product'}, status=404)
 
 class FilterSortView(View):
@@ -170,9 +180,12 @@ class FilterSortView(View):
                     result.append({key:list(Product.objects.all().order_by(sort_list[value]).values())})
                 else:
                     if key not in field_list:
-                        raise Product.DoesNotExist    
+                        raise Product.DoesNotExist 
                     result.append({key:list(Product.objects.filter(**{key:value}).values())})
             return JsonResponse({'result':result}, status=200)
 
         except Product.DoesNotExist as e:
+            return JsonResponse({'MASSAGE':f'{e}'}, status=404)
+            
+        except ValidationError as e:
             return JsonResponse({'MASSAGE':f'{e}'}, status=404)
