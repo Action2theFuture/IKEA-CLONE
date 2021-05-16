@@ -15,12 +15,20 @@ class MainView(View):
             category_list = []
             categorys     = Category.objects.all()
             for category in categorys:
-                sub_categorys = list(SubCategory.objects.filter(category=category).values('korean_name'))
+                sub_categorys = list(SubCategory.objects.filter(category=category))
                 category_list.append(
                     {
                         'id'          : category.id,
-                        'name'        : category.korean_name,
-                        'sub_category': [s['korean_name'] for s in sub_categorys]
+                        'korean_name' : category.korean_name,
+                        'english_name': category.english_name,
+                        'sub_category': [
+                                {
+                                    'id'          : s.id,
+                                    'korean_name' : s.korean_name,
+                                    'english_name': s.english_name
+                                } 
+                                for s in sub_categorys
+                            ]
                     }
                 )
             
@@ -32,14 +40,13 @@ class MainView(View):
 
             for sub_category in sub_categorys:
                 for product in list(Product.objects.filter(sub_category=sub_category)):
-                    product_information = {
-                        'is_new'       : product.is_new,
-                        'english_name' : product.english_name,
-                        'korean_name'  : product.korean_name,
-                        'price'        : product.price
-                    }
                     recommend_product.append(
-                        product_information
+                        {
+                            'is_new'       : product.is_new,
+                            'english_name' : product.english_name,
+                            'korean_name'  : product.korean_name,
+                            'price'        : product.price
+                        }
                     )
 
             # 신상품
@@ -97,7 +104,6 @@ class MainView(View):
             
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
-        
 
 class SubCategoryView(View):
     def get(self, request, category_name):
