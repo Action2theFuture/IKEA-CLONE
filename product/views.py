@@ -126,7 +126,7 @@ class ProductListView(View):
                         'special_price'    : product.special_price,
                         'is_new'           : product.is_new,
                         'color_list'       : [color.name for color in product.color.all()],
-                        'sub_category_name': sub_category.ko_name,
+                        'sub_cat-egory_name': sub_category.ko_name,
                         # 'image'            : Image.objects.get(product=product_id).url
                     }
                 )
