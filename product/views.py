@@ -183,17 +183,22 @@ class FilterSortView(View):
 
     def list(self, request, sub_category_name): 
         product_list = self.set_filters(self.get_queryset(request,sub_category_name), request)
-        print(product_list)
         return list(product_list.values())
 
     def set_filters(self, product_list, request): 
         offset = request.GET.get('offset', None) 
         nextoffset = request.GET.get('nextoffset', None)
-        if offset is None and nextoffset is None:
+        print(type(nextoffset))
+        if (offset != "") and (nextoffset != ""):
+            product_list = product_list[int(offset):int(nextoffset)]
             return product_list
-        product_list = product_list[int(offset):int(nextoffset)]
-        return product_list
-
+        if offset == "":
+            product_list = product_list[:int(nextoffset)]
+            return product_list
+        if nextoffset == "":
+            product_list = product_list[int(offset):]
+            return product_list
+        
     def get(self, request, sub_category_name):
         try:
             field_list = [field.name for field in Product._meta.get_fields()]
@@ -201,8 +206,6 @@ class FilterSortView(View):
             sub_category = SubCategory.objects.get(english_name=sub_category_name)
             product_list = Product.objects.filter(sub_category=sub_category)
             sort_list = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
-
-            print(type(request.GET.keys()))
             if list(request.GET.keys()) == ['offset', 'nextoffset']:
                 result.append(FilterSortView.list(self, request, sub_category_name))
             else:
