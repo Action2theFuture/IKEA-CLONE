@@ -12,9 +12,9 @@ class MainView(View):
     def get(self, request):
         try:
             # 카테고리, 세부 카테고리
-            category_list = []
+            category_list     = []
             sub_category_list = {}
-            categorys     = Category.objects.all()
+            categorys         = Category.objects.all()
             for category in categorys:
                 sub_categorys = list(SubCategory.objects.filter(category=category))
                 category_list.append(
@@ -26,18 +26,17 @@ class MainView(View):
                 )
                 sub_category_list[category.korean_name] = [
                     {
-                        'id'          : s.id,
-                        'korean_name' : s.korean_name,
-                        'english_name': s.english_name
+                        'id'          : sub_category.id,
+                        'korean_name' : sub_category.korean_name,
+                        'english_name': sub_category.english_name
                     } 
-                    for s in sub_categorys
+                    for sub_category in sub_categorys
                 ]
                 
-            
             # 추천 상품
             recommend_product  = []
-            random_nember      = random.randrange(1,Category.objects.count()+1)
-            recommend_category = Category.objects.get(id=random_nember)
+            random_number      = random.randrange(1,Category.objects.count()+1)
+            recommend_category = Category.objects.get(id=random_number)
             sub_categorys      = SubCategory.objects.filter(category=recommend_category)
 
             for sub_category in sub_categorys:
@@ -51,7 +50,7 @@ class MainView(View):
                         }
                     )
 
-            # 신상품
+            # 신상품(정해진 Product)
             new_products        = [] # 신상품
             left_image_lamp     = Product.objects.get(english_name="nikelamp")
             left_image_bed      = Product.objects.get(english_name="nikebed")
@@ -141,13 +140,13 @@ class ProductListView(View):
             for product in products:
                 product_list.append(
                     {
-                        'korean_name'          : product.ko_name,
-                        'english_name'          : product.english_name,
-                        'price'            : product.price,
-                        'special_price'    : product.special_price,
-                        'is_new'           : product.is_new,
-                        'color_list'       : [color.name for color in product.color.all()],
-                        'sub_cat-egory_name': sub_category.ko_name,
+                        'korean_name'       : product.korean_name,
+                        'english_name'      : product.english_name,
+                        'price'             : product.price,
+                        'special_price'     : product.special_price,
+                        'is_new'            : product.is_new,
+                        'color_list'        : [color.name for color in product.color.all()],
+                        'sub_cat-egory_name': sub_category.korean_name,
                         # 'image'            : Image.objects.get(product=product_id).url
                         'star':2
                     }
@@ -159,48 +158,86 @@ class ProductListView(View):
 class ProductDetailView(View):
     def get(self ,request, product_name):
         if Product.objects.filter(english_name=product_name).exists():
-            product            = Product.objects.filter(english_name=product_name).values()
-            product_id         = Product.objects.get(english_name=product_name)
-            descriptions       = Description.objects.filter(product=product_id).values()
-            #color_list         = [color.name for color in product.color.all()]
-            #images             = Image.objects.get(product=product).url
+            product      = Product.objects.filter(english_name=product_name).values()
+            product_id   = Product.objects.get(english_name=product_name)
+            descriptions = Description.objects.filter(product=product_id).values()
+            #color_list  = [color.name for color in product.color.all()]
+            #images      = Image.objects.get(product=product).url
+
+            random_number         = random.randrange(1,SubCategory.objects.count()+1)
+            recommend_subcategory = SubCategory.objects.get(id=random_number)
+            recommend_products    = Product.objects.filter(sub_category=recommend_subcategory).values()
+
             product_list = []
             product_list.append(
                 {
-                    'id':product_id.id,
-                    'korean_name':product_id.korean_name,
-                    'english_name':product_id.english_name,
-                    'stock':product_id.stock,
-                    'is_new':product_id.is_new,
-                    'url':'url',
-                    'descriptions':list(descriptions),
+                    'id'          : product_id.id,
+                    'korean_name' : product_id.korean_name,
+                    'english_name': product_id.english_name,
+                    'price'       : product_id.price,
+                    'stock'       : product_id.stock,
+                    'is_new'      : product_id.is_new,
+                    'url'         : 'url',
+                    'descriptions': list(descriptions),
                 },
             )
+
             return JsonResponse({'product': product_list,
+            'recommend_list': list(recommend_products)
             #'color':color_list, 
             #'images':list(images)
             }, status=200)
         return JsonResponse({'MASSAGE':'Non-existent Product'}, status=404)
 
 class FilterSortView(View):
+    def get_queryset(self, request, sub_category_name): 
+        sub_category = SubCategory.objects.get(english_name=sub_category_name)
+        product_list = Product.objects.filter(sub_category=sub_category)
+        return product_list
+
+    def list(self, request, sub_category_name): 
+        product_list = self.set_filters(self.get_queryset(request,sub_category_name), request)
+        print(product_list)
+        return list(product_list.values())
+
+    def set_filters(self, product_list, request): 
+        offset     = request.GET.get('offset', None)
+        nextoffset = request.GET.get('nextoffset', None)
+        if offset is None and nextoffset is None:
+            return product_list
+        product_list = product_list[int(offset):int(nextoffset)]
+        return product_list
+
     def get(self, request, sub_category_name):
         try:
-            field_list = [field.name for field in Product._meta.get_fields()]
-            result = []
-            sort_list = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
-            for key,value in request.GET.items():
-                if key == 'sort':
-                    if value not in list(sort_list.keys()):
-                        return JsonResponse({'MASSAGE':'INVALID SORT'}, status=404)
-                    result.append({key:list(Product.objects.all().order_by(sort_list[value]).values())})
-                else:
-                    if key not in field_list:
-                        raise Product.DoesNotExist 
-                    result.append({key:list(Product.objects.filter(**{key:value}).values())})
+            field_list   = [field.name for field in Product._meta.get_fields()]
+            result       = []
+            sub_category = SubCategory.objects.get(english_name=sub_category_name)
+            product_list = Product.objects.filter(sub_category=sub_category)
+            sort_list    = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
+
+            print(type(request.GET.keys()))
+            if list(request.GET.keys()) == ['offset', 'nextoffset']:
+                result.append(FilterSortView.list(self, request, sub_category_name))
+            else:
+                for key,value in request.GET.items():
+                    if key == 'sort':
+                        if value not in list(sort_list.keys()):
+                            return JsonResponse({'MASSAGE':'INVALID SORT'}, status=404)
+                        elif value == 'NEWEST':
+                            result.append({key:list(product_list.filter(is_new=True).values())})
+                        else:
+                            result.append({key:list(product_list.order_by(sort_list[value]).values())})
+                        if key not in field_list:
+                            raise Product.DoesNotExist 
+                        result.append({key:list(Product.objects.filter(**{key:value}).values())})
+
             return JsonResponse({'result':result}, status=200)
 
         except Product.DoesNotExist as e:
             return JsonResponse({'MASSAGE':f'{e}'}, status=404)
-            
+
         except ValidationError as e:
             return JsonResponse({'MASSAGE':f'{e}'}, status=404)
+
+    
