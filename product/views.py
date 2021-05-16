@@ -49,7 +49,7 @@ class MainView(View):
                         }
                     )
 
-            # 신상품
+            # 신상품(정해진 Product)
             new_products        = [] # 신상품
             left_image_lamp     = Product.objects.get(english_name="nikelamp")
             left_image_bed      = Product.objects.get(english_name="nikebed")
@@ -126,13 +126,13 @@ class ProductListView(View):
             for product in products:
                 product_list.append(
                     {
-                        'korean_name'       : product.ko_name,
+                        'korean_name'       : product.korean_name,
                         'english_name'      : product.english_name,
                         'price'             : product.price,
                         'special_price'     : product.special_price,
                         'is_new'            : product.is_new,
                         'color_list'        : [color.name for color in product.color.all()],
-                        'sub_cat-egory_name': sub_category.ko_name,
+                        'sub_cat-egory_name': sub_category.korean_name,
                         # 'image'            : Image.objects.get(product=product_id).url
                         'star':2
                     }
@@ -160,6 +160,7 @@ class ProductDetailView(View):
                     'id':product_id.id,
                     'korean_name':product_id.korean_name,
                     'english_name':product_id.english_name,
+                    'price':product_id.price,
                     'stock':product_id.stock,
                     'is_new':product_id.is_new,
                     'url':'url',
@@ -175,20 +176,48 @@ class ProductDetailView(View):
         return JsonResponse({'MASSAGE':'Non-existent Product'}, status=404)
 
 class FilterSortView(View):
+    def get_queryset(self, request, sub_category_name): 
+        sub_category = SubCategory.objects.get(english_name=sub_category_name)
+        product_list = Product.objects.filter(sub_category=sub_category)
+        return product_list
+
+    def list(self, request, sub_category_name): 
+        product_list = self.set_filters(self.get_queryset(request,sub_category_name), request)
+        print(product_list)
+        return list(product_list.values())
+
+    def set_filters(self, product_list, request): 
+        offset = request.GET.get('offset', None) 
+        nextoffset = request.GET.get('nextoffset', None)
+        if offset is None and nextoffset is None:
+            return product_list
+        product_list = product_list[int(offset):int(nextoffset)]
+        return product_list
+
     def get(self, request, sub_category_name):
         try:
             field_list = [field.name for field in Product._meta.get_fields()]
             result = []
+            sub_category = SubCategory.objects.get(english_name=sub_category_name)
+            product_list = Product.objects.filter(sub_category=sub_category)
             sort_list = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
-            for key,value in request.GET.items():
-                if key == 'sort':
-                    if value not in list(sort_list.keys()):
-                        return JsonResponse({'MASSAGE':'INVALID SORT'}, status=404)
-                    result.append({key:list(Product.objects.all().order_by(sort_list[value]).values())})
-                else:
-                    if key not in field_list:
-                        raise Product.DoesNotExist 
-                    result.append({key:list(Product.objects.filter(**{key:value}).values())})
+
+            print(type(request.GET.keys()))
+            if list(request.GET.keys()) == ['offset', 'nextoffset']:
+                result.append(FilterSortView.list(self, request, sub_category_name))
+            else:
+                for key,value in request.GET.items():
+                    if key == 'sort':
+                        if value not in list(sort_list.keys()):
+                            return JsonResponse({'MASSAGE':'INVALID SORT'}, status=404)
+                        elif value == 'NEWEST':
+                            result.append({key:list(product_list.filter(is_new=True).values())})
+                        else:
+                            result.append({key:list(product_list.order_by(sort_list[value]).values())})
+                        if key not in field_list:
+                            raise Product.DoesNotExist 
+                        result.append({key:list(Product.objects.filter(**{key:value}).values())})
+
             return JsonResponse({'result':result}, status=200)
 
         except Product.DoesNotExist as e:
@@ -196,3 +225,5 @@ class FilterSortView(View):
 
         except ValidationError as e:
             return JsonResponse({'MASSAGE':f'{e}'}, status=404)
+
+    
