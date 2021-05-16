@@ -24,7 +24,7 @@ class MainView(View):
                         'english_name': category.english_name
                     }
                 )
-                sub_category_list[category.english_name] = [
+                sub_category_list[category.korean_name] = [
                     {
                         'id'          : s.id,
                         'korean_name' : s.korean_name,
