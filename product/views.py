@@ -12,26 +12,27 @@ class MainView(View):
     def get(self, request):
         try:
             # 카테고리, 세부 카테고리
-            category_list = []
-            categorys     = Category.objects.all()
+            category_list     = []
+            sub_category_list = {}
+            categorys         = Category.objects.all()
             for category in categorys:
                 sub_categorys = list(SubCategory.objects.filter(category=category))
                 category_list.append(
                     {
                         'id'          : category.id,
                         'korean_name' : category.korean_name,
-                        'english_name': category.english_name,
-                        'sub_category': [
-                                {
-                                    'id'          : s.id,
-                                    'korean_name' : s.korean_name,
-                                    'english_name': s.english_name
-                                } 
-                                for s in sub_categorys
-                            ]
+                        'english_name': category.english_name
                     }
                 )
-            
+                sub_category_list[category.korean_name] = [
+                    {
+                        'id'          : sub_category.id,
+                        'korean_name' : sub_category.korean_name,
+                        'english_name': sub_category.english_name
+                    } 
+                    for sub_category in sub_categorys
+                ]
+                
             # 추천 상품
             recommend_product  = []
             random_number      = random.randrange(1,Category.objects.count()+1)
@@ -58,49 +59,62 @@ class MainView(View):
             right_image_bed     = Product.objects.get(english_name="adidasbed")
             right_image_storage = Product.objects.get(english_name="adidasstorage")
             new_products = [
-                {
-                    'lamp' : {
+                [             
+                    {
+                        'id'          : left_image_lamp.id,
                         'is_new'      : left_image_lamp.is_new,
                         'english_name': left_image_lamp.english_name,
                         'korean_name' : left_image_lamp.korean_name,
+                        'sub_category': left_image_lamp.sub_category.korean_name,
                         'price'       : left_image_lamp.price
                     },
-                    'bed' : {
+                    {
+                        'id'          : left_image_bed.id,
                         'is_new'      : left_image_bed.is_new,
                         'english_name': left_image_bed.english_name,
                         'korean_name' : left_image_bed.korean_name,
+                        'sub_category': left_image_bed.sub_category.korean_name,
                         'price'       : left_image_bed.price
                     },
-                    'storage' : {
+                    {
+                        'id'          : left_image_storage.id,
                         'is_new'      : left_image_storage.is_new,
                         'english_name': left_image_storage.english_name,
                         'korean_name' : left_image_storage.korean_name,
+                        'sub_category': left_image_storage.sub_category.korean_name,
                         'price'       : left_image_storage.price
                     }
-                },
-                {
-                    'lamp' : {
+                ]
+                ,
+                [
+                    {
+                        'id'          : right_image_lamp.id,
                         'is_new'      : right_image_lamp.is_new,
                         'english_name': right_image_lamp.english_name,
                         'korean_name' : right_image_lamp.korean_name,
+                        'sub_category': right_image_lamp.sub_category.korean_name,
                         'price'       : right_image_lamp.price
                     },
-                    'bed' : {
+                    {
+                        'id'          : right_image_bed.id,
                         'is_new'      : right_image_bed.is_new,
                         'english_name': right_image_bed.english_name,
                         'korean_name' : right_image_bed.korean_name,
+                        'sub_category': right_image_bed.sub_category.korean_name,
                         'price'       : right_image_bed.price
                     },
-                    'storage' : {
+                    {
+                        'id'          : right_image_storage.id,
                         'is_new'      : right_image_storage.is_new,
                         'english_name': right_image_storage.english_name,
                         'korean_name' : right_image_storage.korean_name,
+                        'sub_category': right_image_storage.sub_category.korean_name,
                         'price'       : right_image_storage.price
                     }
-                }
+                ]
             ]
             
-            return JsonResponse({'category_list':category_list,'recommended':recommend_product, 'new_products':new_products}, status=200)
+            return JsonResponse({'category_list':category_list,'sub_category_list':sub_category_list,'recommended':recommend_product, 'new_products':new_products}, status=200)
             
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
@@ -144,11 +158,11 @@ class ProductListView(View):
 class ProductDetailView(View):
     def get(self ,request, product_name):
         if Product.objects.filter(english_name=product_name).exists():
-            product            = Product.objects.filter(english_name=product_name).values()
-            product_id         = Product.objects.get(english_name=product_name)
-            descriptions       = Description.objects.filter(product=product_id).values()
-            #color_list         = [color.name for color in product.color.all()]
-            #images             = Image.objects.get(product=product).url
+            product      = Product.objects.filter(english_name=product_name).values()
+            product_id   = Product.objects.get(english_name=product_name)
+            descriptions = Description.objects.filter(product=product_id).values()
+            #color_list  = [color.name for color in product.color.all()]
+            #images      = Image.objects.get(product=product).url
 
             random_number         = random.randrange(1,SubCategory.objects.count()+1)
             recommend_subcategory = SubCategory.objects.get(id=random_number)
@@ -157,14 +171,14 @@ class ProductDetailView(View):
             product_list = []
             product_list.append(
                 {
-                    'id':product_id.id,
-                    'korean_name':product_id.korean_name,
-                    'english_name':product_id.english_name,
-                    'price':product_id.price,
-                    'stock':product_id.stock,
-                    'is_new':product_id.is_new,
-                    'url':'url',
-                    'descriptions':list(descriptions),
+                    'id'          : product_id.id,
+                    'korean_name' : product_id.korean_name,
+                    'english_name': product_id.english_name,
+                    'price'       : product_id.price,
+                    'stock'       : product_id.stock,
+                    'is_new'      : product_id.is_new,
+                    'url'         : 'url',
+                    'descriptions': list(descriptions),
                 },
             )
 
@@ -186,7 +200,7 @@ class FilterSortView(View):
         return list(product_list.values())
 
     def set_filters(self, product_list, request): 
-        offset = request.GET.get('offset', None) 
+        offset     = request.GET.get('offset', None)
         nextoffset = request.GET.get('nextoffset', None)
         print(type(nextoffset))
         if (offset != "") and (nextoffset != ""):
@@ -201,11 +215,12 @@ class FilterSortView(View):
         
     def get(self, request, sub_category_name):
         try:
-            field_list = [field.name for field in Product._meta.get_fields()]
-            result = []
+            field_list   = [field.name for field in Product._meta.get_fields()]
+            result       = []
             sub_category = SubCategory.objects.get(english_name=sub_category_name)
             product_list = Product.objects.filter(sub_category=sub_category)
-            sort_list = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
+            sort_list    = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
+
             if list(request.GET.keys()) == ['offset', 'nextoffset']:
                 result.append(FilterSortView.list(self, request, sub_category_name))
             else:
