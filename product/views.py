@@ -86,8 +86,7 @@ class ProductListView(View):
                                 'is_new'            : product.is_new,
                                 'color_list'        : [color.name for color in product.color.all()],
                                 'sub_cat-egory_name': sub_category.korean_name,
-                                # 'image'            : Image.objects.get(product=product_id).url
-                                'star':2
+                                'image'            : Image.objects.get(product=product_id).url
                             }
                         )
 
