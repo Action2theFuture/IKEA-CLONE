@@ -49,19 +49,23 @@ class ProductListView(View):
                 else:
                     #정렬 filter
                     for key, value in request.GET.items():
-                        sort          = request.GET.get('sort','id')
-                        is_new        = request.GET.get('is_new',None)
-                        is_online     = request.GET.get('is_online',None)
-                        color         = request.GET.get('color',None)
-                        series        = request.GET.get('series',None)
-                        special_price = request.GET.get('special_price',0)
-                        result.append(
-                            {
-                                'sort':[product for product in Product.objects.order_by(sort_list[sort]).filter(is_online=is_online).values()],
-                                
-                            }
-                        )
-                        
+                        if key == 'sort':
+                            if value not in list(sort_list.keys()):
+                                return JsonResponse({'massage':'INVALID SORT'}, status=404)
+
+                            elif value == 'NEWEST':
+                                result.append(product_list.filter(is_new=True).values())
+                            else:
+                                result.append(product_list.order_by(sort_list[value]).values())
+
+                        #색상, 가격, 시리즈, 특가, 신제품 filter(가격대 filter code 추가 필요)
+                        elif key != 'sort':
+                            if key not in field_list:
+                                raise Product.DoesNotExist 
+                            else:
+                                result.append(product_list.filter(**{key:value}).values())
+                
+                result = [list(i.values()) for i in result]     
                 return JsonResponse({'result':result}, status=200)
 
             else:
@@ -96,18 +100,4 @@ class ProductListView(View):
         except ValidationError as e:
             return JsonResponse({'massge':f'{e}'}, status=404)
 
-                        # if key == 'sort':
-                        #     if value not in list(sort_list.keys()):
-                        #         return JsonResponse({'massage':'INVALID SORT'}, status=404)
-
-                        #     elif value == 'NEWEST':
-                        #         result.append({key:list(product_list.filter(is_new=True).values())})
-                        #     else:
-                        #         result.append({key:list(product_list.order_by(sort_list[value]).values())})
-
-                        # #색상, 가격, 시리즈, 특가, 신제품 filter(가격대 filter code 추가 필요)
-                        # elif key != 'sort':
-                        #     if key not in field_list:
-                        #         raise Product.DoesNotExist 
-                        #     else:
-                        #         result.append({key:list(product_list.filter(**{key:value}).values())})
+                        
