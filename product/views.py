@@ -86,11 +86,11 @@ class ProductListView(View):
                                 'is_new'            : product.is_new,
                                 'color_list'        : [color.name for color in product.color.all()],
                                 'sub_cat-egory_name': sub_category.korean_name,
-                                'image'            : Image.objects.get(product=product_id).url
+                                'image'             : Image.objects.get(product=product_id).url
                             }
                         )
 
-                    return JsonResponse({'product':product_list,'series':series}, status=200)
+                    return JsonResponse({'product':product_list,'series':series,'content':sub_category.content}, status=200)
                 return JsonResponse({'massage':'Non-existent SubCategoryName'}, status=404)
         
         except Product.DoesNotExist as e:
