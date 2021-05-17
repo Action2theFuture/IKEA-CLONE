@@ -37,9 +37,9 @@ class ProductListView(View):
         try:
             if list(request.GET.keys()) != []:
                 field_list   = [field.name for field in Product._meta.get_fields()]
-                result       = []
+                products     = Product.objects.none()
                 sub_category = SubCategory.objects.get(english_name=sub_category_name)
-                product_list = Product.objects.filter(sub_category=sub_category)
+                products     = Product.objects.filter(sub_category=sub_category)
                 sort_list    = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
 
                 #pagenation 
@@ -54,18 +54,18 @@ class ProductListView(View):
                                 return JsonResponse({'massage':'INVALID SORT'}, status=404)
 
                             elif value == 'NEWEST':
-                                result.append(product_list.filter(is_new=True).values())
+                                products = products.filter(is_new=True).values()
                             else:
-                                result.append(product_list.order_by(sort_list[value]).values())
+                                products = products.order_by(sort_list[value]).values()
 
                         #색상, 가격, 시리즈, 특가, 신제품 filter(가격대 filter code 추가 필요)
                         elif key != 'sort':
                             if key not in field_list:
                                 raise Product.DoesNotExist 
                             else:
-                                result.append(product_list.filter(**{key:value}).values())
-                
-                result = [list(i.values()) for i in result]     
+                                products = products.filter(**{key:value}).values()
+
+                result = [i for i in products.distinct()]     
                 return JsonResponse({'result':result}, status=200)
 
             else:
