@@ -7,6 +7,8 @@ from django.db.models.functions import Lower
 from django.core.exceptions     import ValidationError
 
 from product.models import Product, Category, SubCategory, Color, Description, ProductColor, Image, Series
+from user.utils     import authorize
+
 
 class MainView(View):
     def get(self, request):
@@ -148,7 +150,6 @@ class ProductListView(View):
                         'color_list'        : [color.name for color in product.color.all()],
                         'sub_cat-egory_name': sub_category.korean_name,
                         # 'image'            : Image.objects.get(product=product_id).url
-                        'star':2
                     }
                 )
 
