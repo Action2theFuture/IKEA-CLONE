@@ -4,4 +4,5 @@ from product.views import ProductListView
 
 urlpatterns = [
     path('/cat/<str:sub_category_name>', ProductListView.as_view()),
+    path('/cat/<str:sub_category_name>/', ProductListView.as_view()),
 ]    
