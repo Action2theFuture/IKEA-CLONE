@@ -1,12 +1,9 @@
-import random
-
 from django.views               import View
 from django.http                import JsonResponse
-from django.core.exceptions     import ValidationError
 
-from product.models import Product, Category, SubCategory
+from product.models import Category, SubCategory
 
-class Category(View):
+class CategoryView(View):
     def get(self, request):
         category_list     = []
         sub_category_list = {}
