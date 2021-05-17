@@ -6,8 +6,10 @@ from django.http  import HttpResponseRedirect
 
 from order.models   import OrderList, Order
 from product.models import Product
+from user.utils     import authorize
 
 class OrderListView(View):
+    @authorize
     def get(self,request):
         user           = request.user
         orders         = Order.objects.filter(user=user)
