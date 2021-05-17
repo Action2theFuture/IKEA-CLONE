@@ -24,4 +24,4 @@ def authorize(func):
 
         except Account.DoesNotExist:
             return JsonResponse({'message':'INVALID_USER'}, status=400)
-    return wrapper()
+    return wrapper
