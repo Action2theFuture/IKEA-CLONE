@@ -4,7 +4,7 @@ import random
 from django.views               import View
 from django.http                import JsonResponse, HttpResponse
 
-from product.models import Product, SubCategory, Color, Description, Series
+from product.models             import Product, SubCategory, Color, Description, Series
 
 class ProductDetailView(View):
     def get(self ,request, product_name):
