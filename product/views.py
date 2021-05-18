@@ -16,10 +16,12 @@ class CategoryView(View):
                     'english_name': category.english_name
                 }
             )
-            sub_category_list[category.korean_name] = list(SubCategory.objects.filter(category=category).values(
-                    'id',
-                    'korean_name',
-                    'english_name'
-                )
-            )
+            sub_category_list[category.korean_name] = [
+                {
+                    'id'          : sub_category.id,
+                    'korean_name' : sub_category.korean_name,
+                    'english_name': sub_category.english_name
+                }
+                for sub_category in SubCategory.objects.filter(category=category)
+            ]
         return JsonResponse({'category':category_list,'sub_category':sub_category_list}, status=200)
