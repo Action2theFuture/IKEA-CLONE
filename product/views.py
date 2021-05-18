@@ -13,6 +13,7 @@ class ProductListView(View):
         try:
             sub_category_name = request.GET.get('sub_category_name',None)
             page              = request.GET.get('page',1)
+            order_by          = request.GET.get('sort')
 
             sub_category = SubCategory.objects.get(english_name=sub_category_name)
 
@@ -40,6 +41,14 @@ class ProductListView(View):
                             products = products[page_number*VIEW_PRODUCTS:]
                         elif page_number == page:
                             products = products[page_number*VIEW_PRODUCTS:page_number*10+10]
+
+            sort_list    = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
+
+            if order_by in sort_list.keys():
+                if order_by == 'NEWEST':
+                    products = products.filter(is_new=True)
+                else:
+                    products = products.order_by(sort_list[value])
 
             result = [{ 
                         'id'                : product.id,
