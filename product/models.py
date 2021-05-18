@@ -1,7 +1,11 @@
 from django.db              import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from product.utils import get_background_id
+class BackgroundImage(models.Model):
+    url = models.CharField(max_length=2000)
+
+    class Meta:
+        db_table = "backgorund_images"
 
 class Product(models.Model):
     korean_name      = models.CharField(max_length=128)
@@ -15,15 +19,14 @@ class Product(models.Model):
     sub_category     = models.ForeignKey("SubCategory", on_delete=models.CASCADE, related_name="product")
     comment          = models.ManyToManyField("user.User", through="Comment", related_name="product")
     color            = models.ManyToManyField("Color", through="ProductColor", related_name="product")
-    backgorund_image = models.ForeignKey("BackgroundImage", on_delete=models.CASCADE, default=get_background_id, related_name="product")
+    backgorund_image = models.ForeignKey(
+            "BackgroundImage", 
+            on_delete    = models.CASCADE,
+            default      = BackgroundImage.objects.get_or_create(url="null")[0].id,
+            related_name = "product"
+        )
     class Meta:
         db_table = "products"
-
-class BackgroundImage(models.Model):
-    url     = models.CharField(max_length=2000)
-
-    class Meta:
-        db_table = "backgorund_images"
 
 class Series(models.Model):
     korean_name  = models.CharField(max_length=64)
@@ -49,9 +52,9 @@ class SubCategory(models.Model):
         db_table = "sub_category"
 
 class Comment(models.Model):
-    content = models.TextField(blank=True, null=True)
+    content = models.TextField(default="")
     user    = models.ForeignKey("user.User", on_delete=models.CASCADE) 
-    product = models.ForeignKey("Product", on_delete=models.CASCADE)
+    product = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="product")
     rating  = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(5)], default=0)
 
     class Meta:
