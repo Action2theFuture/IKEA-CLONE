@@ -20,22 +20,23 @@ class ProductListView(View):
             products     = get_queryset(request)
 
             product_count = len(list(products))
-            page_count    = range(product_count//10)
+            page_count    = product_count//10
             
+            LAST_PAGE     = page_count[-1]
             VIEW_PRODUCTS = 10
-
-            if page_count == 0:
+            
+            if page_count <= 1:
                 products = products
 
-            for page_number in page_count:
-                if int(page) == 1:
+            else:
+                if int(page) <= 1:
                     products = products[:VIEW_PRODUCTS]
-
-                elif page_number == page_count[-1]:
-                    products = products[page_number*VIEW_PRODUCTS:]
-
                 else:
-                    products = products[page_number*VIEW_PRODUCTS:page_number*10+10]
+                    for page_number in range(page_count):
+                        if page_number == LAST_PAGE:
+                            products = products[page_number*VIEW_PRODUCTS:]
+                        if page_number == page:
+                            products = products[page_number*VIEW_PRODUCTS:page_number*10+10]
 
             result = [{
                         'korean_name'       : product.korean_name,
@@ -50,7 +51,7 @@ class ProductListView(View):
                         'content'           : sub_category.content
                     } for product in products]
 
-                return JsonResponse({'result':result}, status=200)
+            return JsonResponse({'result':result}, status=200)
                 
         except Product.DoesNotExist as e:
             return JsonResponse({'massage':f'{e}'}, status=404)
