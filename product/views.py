@@ -1,4 +1,5 @@
 import json
+from random                     import uniform
 
 from django.views               import View
 from django.http                import JsonResponse
@@ -28,6 +29,7 @@ class ProductDetailView(View):
                     'url'           : list(images_url),
                     'descriptions'  : list(descriptions),
                     'color'         : color_list, 
+                    'star'          : uniform(0.0,5.0)
                     }]
                     
 
