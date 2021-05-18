@@ -9,28 +9,51 @@ from product.sub_product_queryset import get_queryset
 
 class ProductListView(View):
     def get(self, request)
-    
         try:
             sub_category_name = request.GET.get('sub_category_name',None)
+            page              = request.GET.get('page',1)
 
-            if pk is not None:
-                series       = [series.english_name for series in product.series.all()]
-                products     = get_queryset(self, request)
+            if sub_category_name is None:
+                return JsonResponse({'result':[product for product in product.objects.all().values()]})
 
-                result = [{
-                            'korean_name'       : product.korean_name,
-                            'english_name'      : product.english_name,
-                            'price'             : product.price,
-                            'special_price'     : product.special_price,
-                            'is_new'            : product.is_new,
-                            'color_list'        : [color.name for color in product.color.all()],
-                            'sub_cat-egory_name': sub_category.korean_name,
-                            'image'             : [image.url for image in product.image.all()],
-                            'series'            : series,
-                            'content'           : sub_category.content
-                        } for product in products]
+            series       = [series.english_name for series in product.series.all()]
+            products     = get_queryset(request)
+
+            product_count = len(list(products))
+            page_count    = range(product_count//10)
+            
+            VIEW_PRODUCTS = 10
+
+            if page_count == 0:
+                products = products
+
+            for page_number in page_count:
+                if int(page) == 1:
+                    products = products[:VIEW_PRODUCTS]
+
+                elif page_number == page_count[-1]:
+                    products = products[page_number*VIEW_PRODUCTS:]
+
+                else:
+                    products = products[page_number*VIEW_PRODUCTS:page_number*10+10]
+
+            result = [{
+                        'korean_name'       : product.korean_name,
+                        'english_name'      : product.english_name,
+                        'price'             : product.price,
+                        'special_price'     : product.special_price,
+                        'is_new'            : product.is_new,
+                        'color_list'        : [color.name for color in product.color.all()],
+                        'sub_cat-egory_name': sub_category.korean_name,
+                        'image'             : [image.url for image in product.image.all()],
+                        'series'            : series,
+                        'content'           : sub_category.content
+                    } for product in products]
 
                 return JsonResponse({'result':result}, status=200)
                 
+        except Product.DoesNotExist as e:
+            return JsonResponse({'massage':f'{e}'}, status=404)
+        
         except ValidationError as e:
             return JsonResponse({'massage':f'{e}'}, status=404)
