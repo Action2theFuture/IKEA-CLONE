@@ -1,4 +1,5 @@
 import json
+from random                       import uniform
 
 from django.views                 import View
 from django.http                  import JsonResponse
@@ -51,7 +52,8 @@ class ProductListView(View):
                         'sub_category_name' : sub_category.korean_name,
                         'image'             : [image.url for image in product.image.all()],
                         'series'            : series,
-                        'content'           : sub_category.content
+                        'content'           : sub_category.content,
+                        'star'              : uniform(0.0,5.0)
                     } for product in products]
 
             return JsonResponse({'result':result}, status=200)
