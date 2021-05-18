@@ -33,4 +33,3 @@ class ProductListView(View):
                 
         except ValidationError as e:
             return JsonResponse({'massage':f'{e}'}, status=404)
-
