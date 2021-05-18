@@ -40,7 +40,8 @@ class ProductListView(View):
                         elif page_number == page:
                             products = products[page_number*VIEW_PRODUCTS:page_number*10+10]
 
-            result = [{
+            result = [{ 
+                        'id'                : product.id,
                         'korean_name'       : product.korean_name,
                         'english_name'      : product.english_name,
                         'price'             : product.price,
