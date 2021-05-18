@@ -1,28 +1,28 @@
 from django.db              import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from product.utils import get_background, get_background_id
 class Product(models.Model):
-    korean_name   = models.CharField(max_length=128)
-    english_name  = models.CharField(max_length=128)
-    stock         = models.IntegerField(default=0)
-    price         = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    special_price = models.DecimalField(max_digits=10, decimal_places=2, default=None)
-    is_new        = models.BooleanField(default=False)
-    is_online     = models.BooleanField(default=False)
-    series        = models.ForeignKey("Series", on_delete=models.CASCADE)
-    sub_category  = models.ForeignKey("SubCategory", on_delete=models.CASCADE)
-    comment       = models.ManyToManyField("user.User", through="Comment")
-    color         = models.ManyToManyField("Color", through="ProductColor", related_name="product")
-    backgorund_image = models.ForeignKey("BackgroundImage", on_delete=models.CASCADE, default=1)
+    korean_name      = models.CharField(max_length=128)
+    english_name     = models.CharField(max_length=128)
+    stock            = models.IntegerField(default=0)
+    price            = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    special_price    = models.DecimalField(max_digits=10, decimal_places=2, default=None)
+    is_new           = models.BooleanField(default=False)
+    is_online        = models.BooleanField(default=False)
+    series           = models.ForeignKey("Series", on_delete=models.CASCADE)
+    sub_category     = models.ForeignKey("SubCategory", on_delete=models.CASCADE)
+    comment          = models.ManyToManyField("user.User", through="Comment")
+    color            = models.ManyToManyField("Color", through="ProductColor", related_name="product")
+    backgorund_image = models.ForeignKey("BackgroundImage", on_delete=models.SET(get_background), default=get_background_id)
     class Meta:
         db_table = "products"
 
-class BackgroundImange(models.Model):
+class BackgroundImage(models.Model):
     url     = models.CharField(max_length=2000)
 
     class Meta:
         db_table = "backgorund_images"
-
 
 class Series(models.Model):
     korean_name  = models.CharField(max_length=64)
@@ -86,3 +86,4 @@ class Description(models.Model):
 
     class Meta:
         db_table = "descriptions"
+
