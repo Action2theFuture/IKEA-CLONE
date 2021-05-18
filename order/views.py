@@ -2,45 +2,37 @@ import json
 
 from django.views import View
 from django.http  import JsonResponse
-from django.http  import HttpResponseRedirect
 
-from order.models   import OrderList, Order
-from product.models import Product
+from order.models   import OrderList
+from user.models    import User
 from user.utils     import authorize
 
 class OrderListView(View):
     @authorize
     def get(self,request):
-        user           = request.user
-        orders         = Order.objects.filter(user=user)
-        order_products = []
+        user          = request.user
+        order_list_id = request.GET.get('order_id', None)
+        quantity      = request.GET.get('quantity', 1)
+
+        if order_list_id and quantity:
+            order_product          = OrderList.objects.get(id=order_list_id)
+            order_product.quantity = quantity
+        
+        orders = list(User.order)
+        order_list        = [OrderList.objects.get(order=order) for order in orders]
+        order_products    = []
         total_order_price = 0
-        for order in orders: 
-            order_list = OrderList.objects.filter(order=order)
-            for order_product in order_list: 
-                product = order_product.product
-                order_products.append(
-                    {   
-                        order_product.id,
-                        product.english_name,
-                        product.korean_name,
-                        product.sub_category,
-                        product.price
-                    }
-                )
-                total_order_price += product.price * order_product.quantity
+        for order in order_list: 
+            order_product = OrderList.objects.get(order=order).product
+            order_products.append(
+                {   
+                    order_product.id,
+                    order_product.english_name,
+                    order_product.korean_name,
+                    order_product.sub_category,
+                    order_product.price
+                }
+            )
+            total_order_price += order_product.price * order_product.quantity
         return JsonResponse({'order_list':order_list , 'total_order_price':total_order_price}, status=200)
-
-class OrderQuantityView(View):
-    def post(self,request):
-        try:
-            data           = json.loads(request.body)
-            orderlist_id   = data['order_product_id']
-            quantity       = data['quantity']
-            order          = OrderList.objects.get(id = orderlist_id)
-            order.quantity = quantity
-            return HttpResponseRedirect('/orderlist')
-        except KeyError:
-            JsonResponse({'message':'KEY_ERROR'}, status=400)
-
     
