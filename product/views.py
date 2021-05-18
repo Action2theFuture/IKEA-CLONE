@@ -4,6 +4,7 @@ from random                       import uniform
 from django.views                 import View
 from django.http                  import JsonResponse
 from django.core.exceptions       import ValidationError
+from django.db.models.functions   import Lower
 
 from product.models               import Product, SubCategory
 from product.sub_product_queryset import get_queryset
@@ -13,7 +14,7 @@ class ProductListView(View):
         try:
             sub_category_name = request.GET.get('sub_category_name',None)
             page              = request.GET.get('page',1)
-            order_by          = request.GET.get('sort')
+            order_by          = request.GET.get('sort',None)
 
             sub_category = SubCategory.objects.get(english_name=sub_category_name)
 
