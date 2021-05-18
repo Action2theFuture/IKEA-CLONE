@@ -20,11 +20,13 @@ class OrderListView(View):
             for order_product in order_list: 
                 product = order_product.product
                 order_products.append(
-                    order_product.id,
-                    product.english_name,
-                    product.korean_name,
-                    product.sub_category,
-                    product.price
+                    {   
+                        order_product.id,
+                        product.english_name,
+                        product.korean_name,
+                        product.sub_category,
+                        product.price
+                    }
                 )
                 total_order_price += product.price * order_product.quantity
         return JsonResponse({'order_list':order_list , 'total_order_price':total_order_price}, status=200)
