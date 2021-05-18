@@ -22,7 +22,7 @@ class ProductListView(View):
             product_count = len(list(products))
             page_count    = product_count//10
             
-            LAST_PAGE     = page_count[-1]
+            LAST_PAGE     = page_count-1
             VIEW_PRODUCTS = 10
             
             if page_count <= 1:
