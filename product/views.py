@@ -13,6 +13,8 @@ class ProductListView(View):
             sub_category_name = request.GET.get('sub_category_name',None)
             page              = request.GET.get('page',1)
 
+            sub_category = SubCategory.objects.get(english_name=sub_category_name)
+
             if sub_category_name is None:
                 return JsonResponse({'result':[product for product in product.objects.all().values()]})
 
@@ -45,7 +47,7 @@ class ProductListView(View):
                         'special_price'     : product.special_price,
                         'is_new'            : product.is_new,
                         'color_list'        : [color.name for color in product.color.all()],
-                        'sub_cat-egory_name': sub_category.korean_name,
+                        'sub_category_name': sub_category.korean_name,
                         'image'             : [image.url for image in product.image.all()],
                         'series'            : series,
                         'content'           : sub_category.content
