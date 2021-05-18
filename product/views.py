@@ -48,7 +48,7 @@ class ProductListView(View):
                         'special_price'     : product.special_price,
                         'is_new'            : product.is_new,
                         'color_list'        : [color.name for color in product.color.all()],
-                        'sub_category_name': sub_category.korean_name,
+                        'sub_category_name' : sub_category.korean_name,
                         'image'             : [image.url for image in product.image.all()],
                         'series'            : series,
                         'content'           : sub_category.content
