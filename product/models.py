@@ -1,7 +1,8 @@
 from django.db              import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from product.utils import get_background, get_background_id
+from product.utils import get_background_id
+
 class Product(models.Model):
     korean_name      = models.CharField(max_length=128)
     english_name     = models.CharField(max_length=128)
@@ -10,11 +11,11 @@ class Product(models.Model):
     special_price    = models.DecimalField(max_digits=10, decimal_places=2, default=None)
     is_new           = models.BooleanField(default=False)
     is_online        = models.BooleanField(default=False)
-    series           = models.ForeignKey("Series", on_delete=models.CASCADE)
-    sub_category     = models.ForeignKey("SubCategory", on_delete=models.CASCADE)
-    comment          = models.ManyToManyField("user.User", through="Comment")
+    series           = models.ForeignKey("Series", on_delete=models.CASCADE, related_name="product")
+    sub_category     = models.ForeignKey("SubCategory", on_delete=models.CASCADE, related_name="product")
+    comment          = models.ManyToManyField("user.User", through="Comment", related_name="product")
     color            = models.ManyToManyField("Color", through="ProductColor", related_name="product")
-    backgorund_image = models.ForeignKey("BackgroundImage", on_delete=models.SET(get_background), default=get_background_id)
+    backgorund_image = models.ForeignKey("BackgroundImage", on_delete=models.CASCADE, default=get_background_id, related_name="product")
     class Meta:
         db_table = "products"
 
@@ -42,15 +43,15 @@ class SubCategory(models.Model):
     korean_name  = models.CharField(max_length=64)
     english_name = models.CharField(max_length=64)
     content      = models.TextField(default=None)
-    category     = models.ForeignKey("Category", on_delete=models.CASCADE)
+    category     = models.ForeignKey("Category", on_delete=models.CASCADE, related_name="sub_category")
     
     class Meta:
         db_table = "sub_category"
 
 class Comment(models.Model):
     content = models.TextField(blank=True, null=True)
-    user    = models.ForeignKey("user.User", on_delete=models.CASCADE, related_name="user") 
-    product = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="product")
+    user    = models.ForeignKey("user.User", on_delete=models.CASCADE) 
+    product = models.ForeignKey("Product", on_delete=models.CASCADE)
     rating  = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(5)], default=0)
 
     class Meta:
@@ -72,7 +73,7 @@ class ProductColor(models.Model):
 
 class Image(models.Model):
     url     = models.CharField(max_length=2000)
-    product = models.ForeignKey("Product", on_delete=models.CASCADE)
+    product = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="image")
     
     class Meta:
         db_table = "images"
@@ -82,7 +83,7 @@ class Description(models.Model):
     package   = models.TextField()
     material  = models.TextField()
     recycling = models.TextField()
-    product   = models.ForeignKey("Product", on_delete=models.CASCADE)
+    product   = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="description")
 
     class Meta:
         db_table = "descriptions"
