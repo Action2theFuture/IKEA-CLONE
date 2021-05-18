@@ -27,7 +27,7 @@ class ProductListView(View):
             product_count = len(list(products))
             page_count    = product_count//10
             
-            LAST_PAGE     = page_count-1
+            last_page     = page_count-1
             VIEW_PRODUCTS = 10
             
             if page_count <= 1:
@@ -38,7 +38,7 @@ class ProductListView(View):
                     products = products[:VIEW_PRODUCTS]
                 else:
                     for page_number in range(page_count):
-                        if page_number == LAST_PAGE:
+                        if page_number == last_page:
                             products = products[page_number*VIEW_PRODUCTS:]
                         elif page_number == page:
                             products = products[page_number*VIEW_PRODUCTS:page_number*10+10]
@@ -60,6 +60,7 @@ class ProductListView(View):
                         'is_new'            : product.is_new,
                         'color_list'        : [color.name for color in product.color.all()],
                         'sub_category_name' : sub_category.korean_name,
+                        'sub_category_url'  : sub_category.english_name,
                         'image'             : [image.url for image in product.image.all()],
                         'series'            : series,
                         'content'           : sub_category.content,
