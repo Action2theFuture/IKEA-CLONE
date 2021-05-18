@@ -35,7 +35,7 @@ class ProductListView(View):
                     for page_number in range(page_count):
                         if page_number == LAST_PAGE:
                             products = products[page_number*VIEW_PRODUCTS:]
-                        if page_number == page:
+                        elif page_number == page:
                             products = products[page_number*VIEW_PRODUCTS:page_number*10+10]
 
             result = [{
