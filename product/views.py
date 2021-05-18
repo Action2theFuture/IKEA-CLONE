@@ -1,20 +1,20 @@
 import json
 
-from django.views               import View
-from django.http                import JsonResponse
-from django.core.exceptions     import ValidationError
+from django.views                 import View
+from django.http                  import JsonResponse
+from django.core.exceptions       import ValidationError
 
-from product.models             import Product, SubCategory
+from product.models               import Product, SubCategory
+from product.sub_product_queryset import get_queryset
 
 class ProductListView(View):
     def get(self, request)
         try:
-            pk = request.GET.get('id',None)
+            sub_category_name = request.GET.get('sub_category_name',None)
 
             if pk is not None:
-                sub_category = SubCategory.objects.get(id=pk)
                 series       = [series.english_name for series in product.series.all()]
-                products     = Product.objects.filter(sub_category=sub_category)
+                products     = get_queryset(self, request)
 
                 result = [{
                             'korean_name'       : product.korean_name,
