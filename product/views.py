@@ -16,7 +16,7 @@ class ProductListView(View):
             sub_category = SubCategory.objects.get(english_name=sub_category_name)
 
             if sub_category_name is None:
-                return JsonResponse({'result':[product for product in product.objects.all().values()]})
+                return JsonResponse({'massage':'non-existent sub_Category_name key'}, status=404)
 
             series       = [series.english_name for series in product.series.all()]
             products     = get_queryset(request)
