@@ -54,9 +54,6 @@ class ProductListView(View):
                     } for product in products]
 
             return JsonResponse({'result':result}, status=200)
-                
-        except Product.DoesNotExist as e:
-            return JsonResponse({'massage':f'{e}'}, status=404)
         
         except ValidationError as e:
             return JsonResponse({'massage':f'{e}'}, status=404)
