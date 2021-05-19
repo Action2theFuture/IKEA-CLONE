@@ -1,12 +1,15 @@
 import json
+import operator
+import functools
 from random                       import uniform
 
 from django.views                 import View
 from django.http                  import JsonResponse
 from django.core.exceptions       import ValidationError
+from django.db.models             import Q
 from django.db.models.functions   import Lower
 
-from product.models               import Product, SubCategory
+from product.models               import Product, SubCategory, Series
 from product.sub_product_queryset import get_queryset
 
 class ProductListView(View):
@@ -30,6 +33,23 @@ class ProductListView(View):
                     products = products.filter(is_new=True)
                 else:
                     products = products.order_by(sort_list[order_by])
+            
+
+
+            series_list = [series.english_name for series in Series.objects.all()]
+            fields      = [field.name for field in Product._meta.get_fields()]
+            predicates  = []
+            print(fields)
+            for field in fields:
+                key   = field
+                value = request.GET.get(field)
+                print(value)
+                if value:
+                    predicates.append((key,value))
+            queryList = [Q(x) for x in predicates]
+            print(queryList)
+            if queryList != []:
+                products = products.filter(functools.reduce(operator.and_, queryList))
 
             product_count = len(list(products)) 
             page_count    = product_count//10 
@@ -69,4 +89,7 @@ class ProductListView(View):
             return JsonResponse({'product':result}, status=200)
         
         except ValidationError as e:
+            return JsonResponse({'massage':f'{e}'}, status=404)
+        
+        except KeyError as e:
             return JsonResponse({'massage':f'{e}'}, status=404)
