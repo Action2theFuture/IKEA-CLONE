@@ -6,7 +6,6 @@ from product.models import Product, BackgroundImage
 class NewListView(View):
     def get(self, request):
         new_products      = []
-        # background_image
         background_images = BackgroundImage.objects.all()
         for background_image in background_images[1:]:
             new_products.append(
