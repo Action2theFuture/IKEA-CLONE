@@ -16,7 +16,8 @@ class RecommendList(View):
             for product in sub_category.product.all():
                 images = list(product.image.all().values())
                 if images:
-                    image_url = images[0]['url']
+                    image_url            = images[0]['url']
+                    background_image_url = images[1]['url']
                 recommend_product.append(
                     {
                         'is_new'           : product.is_new,
@@ -25,7 +26,7 @@ class RecommendList(View):
                         'price'            : product.price,
                         'sub_category_name': sub_category.korean_name,
                         'image'            : image_url,
-                        # 'background_image' : product.image.url,
+                        'background_image' : background_image_url,
                         'stars'            : uniform(1.0,5.0)
                     }
                 )
