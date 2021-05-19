@@ -22,11 +22,14 @@ class Product(models.Model):
     backgorund_image = models.ForeignKey(
             "BackgroundImage", 
             on_delete    = models.CASCADE,
-            default      = BackgroundImage.objects.get_or_create(url="null")[0].id,
+            default      = 1,
             related_name = "product"
         )
     class Meta:
         db_table = "products"
+
+
+
 
 class Series(models.Model):
     korean_name  = models.CharField(max_length=64)
