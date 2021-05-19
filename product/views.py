@@ -15,8 +15,8 @@ class ProductDetailView(View):
             if pk is not None:
                 product_list = Product.objects.filter(id=pk).values()
                 product      = Product.objects.get(id=pk)
-                descriptions = Product.description.filter(product=product).values()
-                images_url   = Product.image.filter(product=product).values('url')
+                descriptions = product.description.values()
+                images_url   = product.image.values('url')
 
                 result = [
                     {
@@ -28,7 +28,7 @@ class ProductDetailView(View):
                     'is_new'        : product.is_new,
                     'url'           : list(images_url),
                     'descriptions'  : list(descriptions),
-                    'star'          : uniform(0.0,5.0)
+                    'star'          : uniform(0.0,5.0),
                     'breadcrumb'    : [
                         product.sub_category.category.korean_name, 
                         {'id':product.sub_category.id, 
