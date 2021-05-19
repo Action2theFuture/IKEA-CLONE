@@ -49,7 +49,6 @@ class ProductListView(View):
                     products = products.filter(is_new=True)
                 else:
                     products = products.order_by(sort_list[value])
-
             result = [{ 
                         'id'                : product.id,
                         'korean_name'       : product.korean_name,
@@ -60,8 +59,8 @@ class ProductListView(View):
                         #'color_list'        : [color.name for color in products.color.all()],
                         'sub_category_name' : sub_category.korean_name,
                         'sub_category_url'  : sub_category.english_name,
-                        'image'             : [image.url for image in products.image.all()],
-                        'series'            : [series.english_name for series in products.series.all()],
+                        'image'             : [image.url for image in list(product.image.all())],
+                        'series'            : product.series.korean_name,
                         'content'           : sub_category.content,
                         'star'              : uniform(0.0,5.0)
                     } for product in products]
