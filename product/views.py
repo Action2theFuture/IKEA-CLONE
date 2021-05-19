@@ -33,7 +33,7 @@ class ProductDetailView(View):
                     }]
                     
 
-            return JsonResponse({'result': result}, status=200)
+            return JsonResponse({'product': result}, status=200)
         
         except ValidationError as e:
             return JsonResponse({'massage':f'{e}'}, status=404)
