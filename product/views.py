@@ -1,6 +1,8 @@
 import json
 import operator
 import functools
+import math 
+
 from random                       import uniform
 
 from django.views                 import View
@@ -39,6 +41,7 @@ class ProductListView(View):
             series_list = [series.english_name for series in Series.objects.all()]
             fields      = [field.name for field in Product._meta.get_fields()]
             predicates  = []
+
             print(fields)
             for field in fields:
                 key   = field
@@ -47,28 +50,24 @@ class ProductListView(View):
                 if value:
                     predicates.append((key,value))
             queryList = [Q(x) for x in predicates]
+
             print(queryList)
-            if queryList != []:
+            if not queryList:
                 products = products.filter(functools.reduce(operator.and_, queryList))
 
-            product_count = len(list(products)) 
-            page_count    = product_count//10 
+            product_count = len(list(products))
+            page_count    = math.ceil(product_count/8)
+            last_page     = page_count
+            VIEW_PRODUCTS = 8
             
-            last_page     = page_count-1
-            VIEW_PRODUCTS = 10
-            
-            if page_count <= 2:
-                products = products[:VIEW_PRODUCTS]
-
-            elif page_count > 2:
-                if page <= 1:
+            for page_number in range(1, page_count+1):
+                if page == 1:
                     products = products[:VIEW_PRODUCTS]
-                elif page >= 2:
-                    for page_number in range(page_count):
-                        if page_number == last_page:
-                            products = products[page_number*VIEW_PRODUCTS:]
-                        elif page_number == page:
-                            products = products[page_number*VIEW_PRODUCTS:page_number*VIEW_PRODUCTS+VIEW_PRODUCTS]
+                elif page_number == page:
+                    products = products[(page_number-1)*VIEW_PRODUCTS:page_number*VIEW_PRODUCTS+VIEW_PRODUCTS]
+                if last_page > 2:
+                    if page == last_page:
+                        products = products[(page_number-1)*VIEW_PRODUCTS:]
 
             result = [{ 
                         'id'                : product.id,
