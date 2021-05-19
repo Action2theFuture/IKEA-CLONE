@@ -67,7 +67,7 @@ class ProductListView(View):
                         'star'              : uniform(0.0,5.0)
                     } for product in products]
 
-            return JsonResponse({'result':result}, status=200)
+            return JsonResponse({'product':result}, status=200)
         
         except ValidationError as e:
             return JsonResponse({'massage':f'{e}'}, status=404)
