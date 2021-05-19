@@ -5,7 +5,7 @@ class BackgroundImage(models.Model):
     url = models.CharField(max_length=2000)
 
     class Meta:
-        db_table = "backgorund_images"
+        db_table = "background_images"
 
 class Product(models.Model):
     korean_name      = models.CharField(max_length=128)
@@ -19,7 +19,7 @@ class Product(models.Model):
     sub_category     = models.ForeignKey("SubCategory", on_delete=models.CASCADE, related_name="product")
     comment          = models.ManyToManyField("user.User", through="Comment", related_name="product")
     color            = models.ManyToManyField("Color", through="ProductColor", related_name="product")
-    backgorund_image = models.ForeignKey(
+    background_image = models.ForeignKey(
             "BackgroundImage", 
             on_delete    = models.CASCADE,
             default      = 1,
@@ -27,9 +27,6 @@ class Product(models.Model):
         )
     class Meta:
         db_table = "products"
-
-
-
 
 class Series(models.Model):
     korean_name  = models.CharField(max_length=64)
