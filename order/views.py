@@ -34,6 +34,9 @@ class OrderListView(View):
                 }
                 for order_product in list(OrderList.objects.get(order=order).product)
             ]
+
+            total_order_price = OrderList.objects.filter(order=Order.objects.filter(user=user))
+
             total_order_price += order_product.price * order_product.quantity
         return JsonResponse({'order_list':order_list , 'total_order_price':total_order_price}, status=200)
     
