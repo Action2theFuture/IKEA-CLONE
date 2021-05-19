@@ -8,7 +8,7 @@ from user.models    import User
 from user.utils     import authorize
 
 class OrderListView(View):
-    @authorize
+    #@authorize
     def get(self,request):
         user          = request.user
         order_list_id = request.GET.get('order_id', None)
@@ -23,7 +23,7 @@ class OrderListView(View):
         order_products    = []
         total_order_price = 0
         for order in order_list: 
-            order_product = OrderList.objects.get(order=order).product
+            order_products = OrderList.objects.get(order=order).product.all()
             order_products = [
                 {
                     'id'          : order_product.id,
@@ -33,9 +33,10 @@ class OrderListView(View):
                     'price'       : order_product.price,
                     'url'         : order_product.url[0]
                 }
-                for order_product in list(OrderList.objects.get(order=order).product)
+                for order_product in order_products
             ]
 
             total_order_price += order_product.price * order_product.quantity
-        return JsonResponse({'order_list':order_list , 'total_order_price':total_order_price}, status=200)
+        print(order_products)
+        return JsonResponse({'order_list':order_products , 'total_order_price':total_order_price}, status=200)
     
