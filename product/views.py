@@ -16,11 +16,11 @@ class ProductDetailView(View):
                 product_list = Product.objects.filter(id=pk).values()
                 product      = Product.objects.get(id=pk)
                 descriptions = Product.description.filter(product=product).values()
-                color_list   = [color.name for color in product.color.all()]
                 images_url   = Product.image.filter(product=product).url
 
                 result = [
-                    {'id'           : product.id,
+                    {
+                    'id'            : product.id,
                     'korean_name'   : product.korean_name,
                     'english_name'  : product.english_name,
                     'price'         : product.price,
@@ -28,8 +28,12 @@ class ProductDetailView(View):
                     'is_new'        : product.is_new,
                     'url'           : list(images_url),
                     'descriptions'  : list(descriptions),
-                    'color'         : color_list, 
                     'star'          : uniform(0.0,5.0)
+                    'breadcrumb'    : [
+                        product.sub_category.category.korean_name, 
+                        {'id':product.sub_category.id, 
+                        'name':product.sub_category.korean_name}, 
+                        product.korean_name]
                     }]
                     
 
