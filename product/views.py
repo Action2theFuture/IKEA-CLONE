@@ -16,7 +16,7 @@ class ProductDetailView(View):
                 product_list = Product.objects.filter(id=pk).values()
                 product      = Product.objects.get(id=pk)
                 descriptions = Product.description.filter(product=product).values()
-                images_url   = Product.image.filter(product=product).url
+                images_url   = Product.image.filter(product=product).values('url')
 
                 result = [
                     {
