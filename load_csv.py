@@ -9,6 +9,7 @@ with open('data.csv') as csv_file:
         img_rows = csv.reader(img_file)
         img_rows = list(img_rows)
         rows = list(rows)
+        BackgroundImage.objects.create(url="null")
         for idx, row in enumerate(rows):
             if idx == 0:
                 continue
@@ -40,7 +41,8 @@ with open('data.csv') as csv_file:
                 is_new        = row[15],
                 stock         = row[16],
                 sub_category  = SubCategory.objects.get(korean_name=row[2]),
-                series        = Series.objects.get(korean_name=row[4])
+                series        = Series.objects.get(korean_name=row[4]),
+                background    = 1
             )
 
             Description.objects.create(
