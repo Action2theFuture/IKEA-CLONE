@@ -77,7 +77,7 @@ class ProductListView(View):
                         'color_list'        : [color.name for color in products.color.all()],
                         'sub_category_name' : sub_category.korean_name,
                         'sub_category_url'  : sub_category.english_name,
-                        'image'             : [image.url for image in list(product.image.url)],
+                        'image'             : [url['url'] for url in product.image.values('url')],
                         'series'            : product.series.korean_name,
                         'content'           : sub_category.content,
                         'star'              : uniform(0.0,5.0)
