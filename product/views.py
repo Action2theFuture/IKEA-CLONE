@@ -8,14 +8,17 @@ class CategoryView(View):
         category_list     = []
         sub_category_list = {}
         categorys         = Category.objects.all()
+
+        category_list = [
+            {
+                'id'          : category.id,
+                'korean_name' : category.korean_name,
+                'english_name': category.english_name
+            }
+            for category in categorys
+        ]
+
         for category in categorys:
-            category_list.append(
-                {
-                    'id'          : category.id,
-                    'korean_name' : category.korean_name,
-                    'english_name': category.english_name
-                }
-            )
             sub_category_list[category.korean_name] = [
                 {
                     'id'          : sub_category.id,
