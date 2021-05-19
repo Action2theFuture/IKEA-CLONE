@@ -9,7 +9,7 @@ class User(models.Model):
     birthday     = models.CharField(max_length=32)
     create_at    = models.DateTimeField(auto_now_add=True)
     update_at    = models.DateTimeField(auto_now=True)
-    wish_list    = models.ManyToManyField("product.Product", through="WishList")
+    wish_list    = models.ManyToManyField("product.Product", through="WishList", related_name="user")
 
     class Meta:
         db_table = "users"
