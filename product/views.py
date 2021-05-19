@@ -16,14 +16,14 @@ class ProductDetailView(View):
                 product_list = Product.objects.filter(id=pk).values()
                 product      = Product.objects.get(id=pk)
                 descriptions = product.description.values()
-                images_url   = product.image.values('url')
+                images_url   = [url['url'] for url in product.image.values('url')]
 
                 result = [
                     {
                     'id'            : product.id,
                     'korean_name'   : product.korean_name,
                     'english_name'  : product.english_name,
-                    'price'         : product.price,
+                    'price'         : int(product.price),
                     'stock'         : product.stock,
                     'is_new'        : product.is_new,
                     'url'           : list(images_url),
