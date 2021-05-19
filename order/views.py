@@ -30,7 +30,8 @@ class OrderListView(View):
                     'english_name': order_product.english_name,
                     'korean_name' : order_product.korean_name,
                     'sub_category': order_product.sub_category,
-                    'price'       : order_product.price
+                    'price'       : order_product.price,
+                    'url'         : order_product.url[0]
                 }
                 for order_product in list(OrderList.objects.get(order=order).product)
             ]
