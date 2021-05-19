@@ -41,7 +41,7 @@ class ProductListView(View):
                         if page_number == last_page:
                             products = products[page_number*VIEW_PRODUCTS:]
                         elif page_number == page:
-                            products = products[page_number*VIEW_PRODUCTS:page_number*10+10]
+                            products = products[page_number*VIEW_PRODUCTS:page_number*VIEW_PRODUCTS+VIEW_PRODUCTS]
 
             sort_list    = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
 
