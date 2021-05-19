@@ -28,7 +28,10 @@ class ProductListView(View):
 
             products     = get_queryset(request)
 
-            sort_list    = {'PRICE_LOW_TO_HIGH':'price','PRICE_HIGH_TO_LOW':'-price','NEWEST':'is_new','NAME_ASCENDING':Lower('ko_name')}
+            sort_list    = {'PRICE_LOW_TO_HIGH':'price',
+                            'PRICE_HIGH_TO_LOW':'-price',
+                                       'NEWEST':'is_new',
+                               'NAME_ASCENDING':Lower('ko_name')}
 
             if order_by in sort_list.keys():
                 if order_by == 'NEWEST':
@@ -74,10 +77,10 @@ class ProductListView(View):
                         'price'             : product.price,
                         'special_price'     : product.special_price,
                         'is_new'            : product.is_new,
-                        'color_list'        : [color.name for color in products.color.all()],
+                        'color_list'        : [color.korean_name for color in product.color.all()],
                         'sub_category_name' : sub_category.korean_name,
                         'sub_category_url'  : sub_category.english_name,
-                        'image'             : [url['url'] for url in product.image.values('url')],
+                        'image'             : [image.url for image in product.image.all()],
                         'series'            : product.series.korean_name,
                         'content'           : sub_category.content,
                         'star'              : uniform(0.0,5.0)
