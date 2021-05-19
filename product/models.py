@@ -19,7 +19,7 @@ class Product(models.Model):
     sub_category     = models.ForeignKey("SubCategory", on_delete=models.CASCADE, related_name="product")
     comment          = models.ManyToManyField("user.User", through="Comment", related_name="product")
     color            = models.ManyToManyField("Color", through="ProductColor", related_name="product")
-    backgorund_image = models.ForeignKey(
+    background_image = models.ForeignKey(
             "BackgroundImage", 
             on_delete    = models.CASCADE,
             default      = 1,
