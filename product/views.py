@@ -9,19 +9,20 @@ class NewListView(View):
         background_images = BackgroundImage.objects.all()
         for background_image in background_images[1:]:
             new_products.append(
-                [
                     {
                         'id'      : background_image.id,
                         'src'     : background_image.url,
-                        'products': {
-                            'id'          : product.id,
-                            'is_new'      : product.is_new,
-                            'english_name': product.english_name,
-                            'korean_name' : product.korean_name,
-                            'price'       : product.price
-                        }   
-                    }
-                    for product in Product.objects.filter(background_image = background_image)
-                ]
-            )
+                        'products': [
+                            {
+                                'id'          : product.id,
+                                'is_new'      : product.is_new,
+                                'english_name': product.english_name,
+                                'korean_name' : product.korean_name,
+                                'sub_category': product.sub_category.korean_name,
+                                'price'       : product.price
+                            }
+                            for product in Product.objects.filter(background_image = background_image)
+                        ]
+                    }   
+                )
         return JsonResponse({'new_products':new_products}, status=200)
