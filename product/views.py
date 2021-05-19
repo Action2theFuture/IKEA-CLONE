@@ -3,18 +3,14 @@ from random                     import uniform
 
 from django.views               import View
 from django.http                import JsonResponse
-from django.core.exceptions     import ValidationError
 
 from product.models             import Product
 
 class ProductDetailView(View):
-    def get(self ,request):
+    def get(self ,request, product_id):
         try:
-            pk = request.GET.get('id',None)
-
-            if pk is not None:
-                product_list = Product.objects.filter(id=pk).values()
-                product      = Product.objects.get(id=pk)
+            if Product.objects.filter(id=product_id).exists():
+                product      = Product.objects.get(id=product_id)
                 descriptions = product.description.values()
                 images_url   = [url['url'] for url in product.image.values('url')]
 
@@ -26,7 +22,7 @@ class ProductDetailView(View):
                     'price'         : int(product.price),
                     'stock'         : product.stock,
                     'is_new'        : product.is_new,
-                    'url'           : list(images_url),
+                    'url'           : [image.url for image in product.image.all()],
                     'descriptions'  : list(descriptions),
                     'star'          : uniform(0.0,5.0),
                     'breadcrumb'    : [
@@ -38,6 +34,3 @@ class ProductDetailView(View):
                     
 
             return JsonResponse({'product': result}, status=200)
-        
-        except ValidationError as e:
-            return JsonResponse({'massage':f'{e}'}, status=404)
