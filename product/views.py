@@ -42,7 +42,6 @@ class ProductListView(View):
             fields      = [field.name for field in Product._meta.get_fields()]
             predicates  = []
 
-            print(fields)
             for field in fields:
                 key   = field
                 value = request.GET.get(field)
@@ -51,8 +50,7 @@ class ProductListView(View):
                     predicates.append((key,value))
             queryList = [Q(x) for x in predicates]
 
-            print(queryList)
-            if not queryList:
+            if queryList:
                 products = products.filter(functools.reduce(operator.and_, queryList))
 
             product_count = len(list(products))
@@ -79,7 +77,7 @@ class ProductListView(View):
                         'color_list'        : [color.name for color in products.color.all()],
                         'sub_category_name' : sub_category.korean_name,
                         'sub_category_url'  : sub_category.english_name,
-                        'image'             : [image.url for image in list(product.image.all())],
+                        'image'             : [image.url for image in list(product.image.url)],
                         'series'            : product.series.korean_name,
                         'content'           : sub_category.content,
                         'star'              : uniform(0.0,5.0)
