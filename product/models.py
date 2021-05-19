@@ -5,7 +5,7 @@ class BackgroundImage(models.Model):
     url = models.CharField(max_length=2000)
 
     class Meta:
-        db_table = "backgorund_images"
+        db_table = "background_images"
 
 class Product(models.Model):
     korean_name      = models.CharField(max_length=128)
@@ -27,9 +27,6 @@ class Product(models.Model):
         )
     class Meta:
         db_table = "products"
-
-
-
 
 class Series(models.Model):
     korean_name  = models.CharField(max_length=64)
