@@ -3,7 +3,7 @@
 
 my_settings.py
 *.csv
-
+load_csv.py
 ### Linux ###
 *~
 
