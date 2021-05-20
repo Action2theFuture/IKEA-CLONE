@@ -44,7 +44,11 @@ class ProductListView(View):
                 key   = field
                 value = request.GET.get(field)
                 if value:
-                    predicates.append((key,value))
+                    if key == 'price':
+                        min_price, max_price = value.split('-')
+                        products = products.filter(price__gte=min_price, price__lte=max_price)
+                    else:
+                        predicates.append((key,value))
             queryList = [Q(x) for x in predicates]
 
             if queryList:
@@ -85,8 +89,8 @@ class ProductListView(View):
         except ValidationError as e:
             return JsonResponse({'massage':f'{e}'}, status=404)
         
-        except KeyError as e:
-            return JsonResponse({'massage':f'{e}'}, status=404)
+        except KeyError:
+            return JsonResponse({'massage':'keyerror'}, status=404)
 
 class RecommendedView(View):
     def get(self, request):
