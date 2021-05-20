@@ -102,7 +102,7 @@ class RecommendedView(View):
                     'is_new'           : product.is_new,
                     'english_name'     : product.english_name,
                     'korean_name'      : product.korean_name,
-                    'price'            : product.price,
+                    'price'            : int(product.price),
                     'sub_category_name': product.sub_category.korean_name,
                     'star'             : uniform(1.0,5.0),
                     'image'            : [
