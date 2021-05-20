@@ -8,7 +8,7 @@ from user.models    import User
 from user.utils     import authorize
 
 class OrderListView(View):
-    #@authorize
+    @authorize
     def get(self,request):
         user          = request.user
         order_list_id = request.GET.get('order_id', None)
