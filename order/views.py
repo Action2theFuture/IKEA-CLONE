@@ -13,7 +13,7 @@ class OrderListView(View):
         user       = request.user
         orders     = user.order.all()
         order_list = OrderList.objects.filter(order__in=orders)
-
+        
         order_products = [
             {
                 'order_id'    : order.id,
@@ -21,8 +21,9 @@ class OrderListView(View):
                 'english_name': order.product.english_name,
                 'korean_name' : order.product.korean_name,
                 'sub_category': order.product.sub_category.korean_name,
-                'price'       : order.product.price,
-                'url'         : order.product.image.all().first().url
+                'price'       : int(order.product.price),
+                'url'         : order.product.image.all().first().url,
+                'quantity'    : order.quantity
             }
             for order in order_list]
 
@@ -34,9 +35,10 @@ class OrderListView(View):
     def fetch(self, request):
         data = json.loads(request.body)
         try:
-            order_id = data['order_id']
-            quantity = data['quantity']
+            order_id               = data['order_id']
+            quantity               = data['quantity']
             order_product          = OrderList.objects.get(id=order_id)
             order_product.quantity = quantity
+            return JsonResponse({'message': 'SUCCESS'}, status=200)
         except KeyError:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
