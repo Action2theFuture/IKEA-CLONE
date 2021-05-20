@@ -10,15 +10,16 @@ from user.utils     import authorize
 class OrderListView(View):
     @authorize
     def get(self,request):
-        user          = request.user
+        #user          = request.user
+        user = User.objects.get(id=1)
         order_list_id = request.GET.get('order_id', None)
         quantity      = request.GET.get('quantity', 1)
-
+        print(user)
         if order_list_id and quantity:
             order_product          = OrderList.objects.get(id=order_list_id)
             order_product.quantity = quantity
         
-        orders = list(User.order)
+        orders = list(user.order)
         order_list        = [OrderList.objects.get(order=order) for order in orders]
         order_products    = []
         total_order_price = 0
