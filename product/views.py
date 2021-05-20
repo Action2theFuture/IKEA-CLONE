@@ -1,4 +1,3 @@
-import json
 from random  import uniform
 
 from django.views   import View
