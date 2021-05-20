@@ -36,10 +36,10 @@ class ProductListView(View):
                     products = products.filter(is_new=True)
                 else:
                     products = products.order_by(sort_list[order_by])
-
+            #필터 기능
             fields      = [field.name for field in Product._meta.get_fields()]
             predicates  = []
-            #필터 기능
+            
             for field in fields:
                 key   = field
                 value = request.GET.get(field)
