@@ -67,7 +67,7 @@ class ProductListView(View):
                 if last_page > 2:
                     if page == last_page:
                         products = products[(page_number-1)*VIEW_PRODUCTS:]
-
+                        
             result = [{ 
                         'id'                : product.id,
                         'korean_name'       : product.korean_name,
