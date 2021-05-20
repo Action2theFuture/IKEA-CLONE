@@ -1,4 +1,5 @@
-from random import uniform
+import json
+from random  import uniform
 
 from django.views   import View
 from django.http    import JsonResponse
@@ -7,11 +8,11 @@ from product.models import Product, BackgroundImage, Category, SubCategory
 
 class NewListView(View):
     def get(self, request):
-        background_images = BackgroundImage.objects.all()
-        new_products = [
+        background_images = BackgroundImage.objects.exclude(url="/images/products/null.png")
+        new_products      = [
             {
                 'id'      : background_image.id,
-                'src'     : background_image.url,
+                'url'     : background_image.url,
                 'products': [
                     {
                         'id'          : product.id,
@@ -21,11 +22,40 @@ class NewListView(View):
                         'sub_category': product.sub_category.korean_name,
                         'price'       : int(product.price)
                     }
-                    for product in Product.objects.filter(background_image = background_image)
+                    for product in background_image.product.all()
                 ]
             }   
-            for background_image in background_images[1:]]
+            for background_image in background_images]
         return JsonResponse({'new_products':new_products}, status=200)
+
+class ProductDetailView(View):
+    def get(self ,request, product_id):
+        if not Product.objects.filter(id=product_id).exists():
+            return JsonResponse({'massage':'non-existent product'}, status=404)
+            
+        product      = Product.objects.get(id=product_id)
+        descriptions = product.description.values()
+        images_url   = [url['url'] for url in product.image.values('url')]
+
+        result = [
+            {
+            'id'            : product.id,
+            'korean_name'   : product.korean_name,
+            'english_name'  : product.english_name,
+            'price'         : int(product.price),
+            'stock'         : int(product.stock),
+            'is_new'        : product.is_new,
+            'url'           : [image.url for image in product.image.all()],
+            'descriptions'  : list(descriptions),
+            'star'          : uniform(0.0,5.0),
+            'breadcrumb'    : [
+                product.sub_category.category.korean_name, 
+                {'id':product.sub_category.id, 
+                'name':product.sub_category.korean_name}, 
+                product.korean_name]
+            }]
+
+        return JsonResponse({'product': result}, status=200)
 
 class RecommendedView(View):
     def get(self, request):
