@@ -29,7 +29,7 @@ class ProductListView(View):
             sort_list    = {'PRICE_LOW_TO_HIGH':'price',
                             'PRICE_HIGH_TO_LOW':'-price',
                                        'NEWEST':'is_new',
-                               'NAME_ASCENDING':Lower('korean_name')}
+                               'NAME_ASCENDING':Lower('english_name')}
             #정렬 기능
             if order_by in sort_list.keys():
                 if order_by == 'NEWEST':
