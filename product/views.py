@@ -19,7 +19,7 @@ class RecommendList(View):
                     'korean_name'      : product.korean_name,
                     'price'            : product.price,
                     'sub_category_name': sub_category.korean_name,
-                    'stars'            : uniform(1.0,5.0),
+                    'star'            : uniform(1.0,5.0),
                     'image'            : [
                             image.url
                             for image in product.image.all()[:2]
