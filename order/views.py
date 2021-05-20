@@ -10,11 +10,9 @@ from user.utils     import authorize
 class OrderListView(View):
     @authorize
     def get(self,request):
-        #user          = request.user
-        user = User.objects.get(id=1)
+        user          = request.user
         order_list_id = request.GET.get('order_id', None)
         quantity      = request.GET.get('quantity', 1)
-        print(user)
         if order_list_id and quantity:
             order_product          = OrderList.objects.get(id=order_list_id)
             order_product.quantity = quantity
@@ -38,6 +36,5 @@ class OrderListView(View):
             ]
 
             total_order_price += order_product.price * order_product.quantity
-        print(order_products)
         return JsonResponse({'order_list':order_products , 'total_order_price':total_order_price}, status=200)
     
