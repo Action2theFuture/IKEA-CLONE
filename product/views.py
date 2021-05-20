@@ -11,6 +11,7 @@ class ProductDetailView(View):
     def get(self ,request, product_id):
         if not Product.objects.filter(id=product_id).exists():
             return JsonResponse({'massage':'non-existent product'}, status=404)
+            
         product      = Product.objects.get(id=product_id)
         descriptions = product.description.values()
         images_url   = [url['url'] for url in product.image.values('url')]
@@ -34,7 +35,7 @@ class ProductDetailView(View):
             }]
 
         return JsonResponse({'product': result}, status=200)
-        
+
 class RecommendedView(View):
     def get(self, request):
         RECOMMENDED_COUNT = 10
