@@ -22,7 +22,7 @@ class ProductDetailView(View):
             'korean_name'   : product.korean_name,
             'english_name'  : product.english_name,
             'price'         : int(product.price),
-            'stock'         : product.stock,
+            'stock'         : int(product.stock),
             'is_new'        : product.is_new,
             'url'           : [image.url for image in product.image.all()],
             'descriptions'  : list(descriptions),
