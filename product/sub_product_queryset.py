@@ -1,6 +1,7 @@
-from product.models               import Product, SubCategory
+from product.models         import Product, SubCategory
 
-from django.core.exceptions       import ValidationError
+from django.core.exceptions import ValidationError
+from django.http            import JsonResponse
 
 def get_queryset(request):
     try:
