@@ -1,9 +1,7 @@
-import json
 import operator
 import functools
 import math 
-
-from random                       import uniform
+from random  import uniform
 
 from django.views                 import View
 from django.http                  import JsonResponse
@@ -11,8 +9,30 @@ from django.core.exceptions       import ValidationError
 from django.db.models             import Q
 from django.db.models.functions   import Lower
 
-from product.models               import Product, Series, Category, SubCategory
+from product.models import Product, BackgroundImage, Category, SubCategory
 from product.sub_product_queryset import get_queryset
+
+class NewListView(View):
+    def get(self, request):
+        background_images = BackgroundImage.objects.exclude(url="/images/products/null.png")
+        new_products      = [
+            {
+                'id'      : background_image.id,
+                'url'     : background_image.url,
+                'products': [
+                    {
+                        'id'          : product.id,
+                        'is_new'      : product.is_new,
+                        'english_name': product.english_name,
+                        'korean_name' : product.korean_name,
+                        'sub_category': product.sub_category.korean_name,
+                        'price'       : int(product.price)
+                    }
+                    for product in background_image.product.all()
+                ]
+            }   
+            for background_image in background_images]
+        return JsonResponse({'new_products':new_products}, status=200)
 
 class ProductListView(View):
     def get(self, request):
