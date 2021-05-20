@@ -7,38 +7,41 @@ from django.db.models import F, Sum
 from order.models   import OrderList
 from user.utils     import authorize
 
-class OrderListView(View):
+class CartView(View):
     @authorize
     def get(self,request):
-        user       = request.user
-        orders     = user.order.all()
-        order_list = OrderList.objects.filter(order__in=orders)
+        cart_list = OrderList.objects.filter(order__status__status="결제대기", order__user=request.user)
         
         order_products = [
             {
-                'order_id'    : order.id,
-                'id'          : order.product.id,
-                'english_name': order.product.english_name,
-                'korean_name' : order.product.korean_name,
-                'sub_category': order.product.sub_category.korean_name,
-                'price'       : int(order.product.price),
-                'url'         : order.product.image.all().first().url,
-                'quantity'    : order.quantity
+                'cart_id'    : cart.id,
+                'id'          : cart.product.id,
+                'english_name': cart.product.english_name,
+                'korean_name' : cart.product.korean_name,
+                'sub_category': cart.product.sub_category.korean_name,
+                'price'       : int(cart.product.price),
+                'url'         : cart.product.image.all().first().url,
+                'quantity'    : cart.quantity
             }
-            for order in order_list]
+            for cart in cart_list]
 
-        order_list_qs     = order_list.annotate(price=F('product__price')*F('quantity'))
-        total_order_price = order_list_qs.aggregate(total_price=Sum('price'))['total_price']
+        cart_list_query_set = cart_list.annotate(price=F('product__price')*F('quantity'))
+        total_order_price   = cart_list_query_set.aggregate(total_price=Sum('price'))['total_price']
 
         return JsonResponse({'order_list':order_products , 'total_order_price':total_order_price}, status=200)
 
-    def fetch(self, request):
+    def petch(self, request):
         data = json.loads(request.body)
         try:
-            order_id               = data['order_id']
-            quantity               = data['quantity']
-            order_product          = OrderList.objects.get(id=order_id)
-            order_product.quantity = quantity
+            cart_id               = data['cart_id']
+            quantity              = data['quantity']
+            cart_product          = OrderList.objects.get(id=cart_id)
+            cart_product.quantity = quantity
+            cart_product.save()
             return JsonResponse({'message': 'SUCCESS'}, status=200)
+
+        except OrderList.DoesNotExist:
+            return JsonResponse({'message': 'NOT_FOUND'}, status=404)
+
         except KeyError:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
