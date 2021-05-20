@@ -49,12 +49,12 @@ class ProductListView(View):
 
             if queryList:
                 products = products.filter(functools.reduce(operator.and_, queryList))
-
+            #페이지네이션 기능
             product_count = len(list(products))
             VIEW_PRODUCTS = 8
             page_count    = math.ceil(product_count/VIEW_PRODUCTS)
             last_page     = page_count
-            #페이지네이션 기능
+            
             for page_number in range(1, page_count+1):
                 if page == 1:
                     products = products[:VIEW_PRODUCTS]
