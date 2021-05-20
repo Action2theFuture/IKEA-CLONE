@@ -1,9 +1,10 @@
+import json
+
 from django.views     import View
 from django.http      import JsonResponse
 from django.db.models import F, Sum
 
-
-from order.models   import OrderList, User
+from order.models   import OrderList
 from user.utils     import authorize
 
 class OrderListView(View):
@@ -15,6 +16,7 @@ class OrderListView(View):
 
         order_products = [
             {
+                'order_id'    : order.id,
                 'id'          : order.product.id,
                 'english_name': order.product.english_name,
                 'korean_name' : order.product.korean_name,
@@ -30,8 +32,11 @@ class OrderListView(View):
         return JsonResponse({'order_list':order_products , 'total_order_price':total_order_price}, status=200)
 
     def fetch(self, request):
-        order_list_id = request.GET.get('order_id', None)
-        quantity      = request.GET.get('quantity', 1)
-
-        order_product          = OrderList.objects.get(id=order_list_id)
-        order_product.quantity = quantity
+        data = json.loads(request.body)
+        try:
+            order_id = data['order_id']
+            quantity = data['quantity']
+            order_product          = OrderList.objects.get(id=order_id)
+            order_product.quantity = quantity
+        except KeyError:
+            return JsonResponse({'message': 'KEY_ERROR'}, status=400)
