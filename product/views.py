@@ -3,7 +3,7 @@ from random import uniform
 from django.views           import View
 from django.http            import JsonResponse
 
-from product.models import Product
+from product.models import Product, Category, SubCategory
 
 class RecommendedView(View):
     def get(self, request):
@@ -25,3 +25,25 @@ class RecommendedView(View):
                 for product in products]
         
         return JsonResponse({'recommended_product':recommended_product}, status=200)
+
+class CategoryView(View):
+    def get(self, request):
+        category_list     = []
+        categorys         = Category.objects.all()
+
+        category_list = [
+            {
+                'id'          : category.id,
+                'korean_name' : category.korean_name,
+                'english_name': category.english_name,
+                'sub_category': [
+                    {
+                    'id'          : sub_category.id,
+                    'korean_name' : sub_category.korean_name,
+                    'english_name': sub_category.english_name
+                    }
+                for sub_category in SubCategory.objects.filter(category=category)]
+            }
+            for category in categorys]
+
+        return JsonResponse({'category':category_list}, status=200)

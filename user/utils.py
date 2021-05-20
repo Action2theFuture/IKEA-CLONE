@@ -22,6 +22,6 @@ def authorize(func):
         except jwt.exceptions.DecodeError:
             return JsonResponse({'message':'INVALID_TOKEN' }, status=400)
 
-        except Account.DoesNotExist:
+        except User.DoesNotExist:
             return JsonResponse({'message':'INVALID_USER'}, status=400)
     return wrapper
