@@ -8,15 +8,14 @@ from user.models    import User
 from user.utils     import authorize
 
 class OrderListView(View):
-    #@authorize
+    @authorize
     def get(self,request):
-        #user          = request.user
-        user = User.objects.get(id=1)
-        # order_list_id = request.GET.get('order_id', None)
-        # quantity      = request.GET.get('quantity', 1)
-        # if order_list_id and quantity:
-        #     order_product          = OrderList.objects.get(id=order_list_id)
-        #     order_product.quantity = quantity
+        user          = request.user
+        order_list_id = request.GET.get('order_id', None)
+        quantity      = request.GET.get('quantity', 1)
+        if order_list_id and quantity:
+            order_product          = OrderList.objects.get(id=order_list_id)
+            order_product.quantity = quantity
         
         orders            = user.order.all()
         order_list        = [OrderList.objects.get(order=order) for order in orders]
@@ -35,10 +34,7 @@ class OrderListView(View):
                         'url'         : product.image.all().first().url
                     }
                 )
-            order.price = F('quantity') * product.price
-            total_order_price += order.price
-        print(total_order_price)
-        # order_list.aggregate(Sum('price'))
+            total_order_price += product.price * order.quantity
         
         return JsonResponse({'order_list':order_products , 'total_order_price':total_order_price}, status=200)
     
