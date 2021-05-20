@@ -57,9 +57,9 @@ class ProductListView(View):
                 products = products.filter(functools.reduce(operator.and_, queryList))
 
             product_count = len(list(products))
-            page_count    = math.ceil(product_count/8)
-            last_page     = page_count
             VIEW_PRODUCTS = 8
+            page_count    = math.ceil(product_count/VIEW_PRODUCTS)
+            last_page     = page_count
             
             for page_number in range(1, page_count+1):
                 if page == 1:
