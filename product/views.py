@@ -5,14 +5,14 @@ from django.http            import JsonResponse
 
 from product.models import Category
 
-class RecommendList(View):
+class RecommendedView(View):
     def get(self, request):
-        recommend_product  = []
+        recommended_product  = []
         category_list      = Category.objects.all()
         random_number      = randrange(0,len(category_list))
-        recommend_category = category_list[random_number]
-        sub_categorys      = recommend_category.sub_category.all()
-        recommend_product= [
+        recommended_category = category_list[random_number]
+        sub_categorys      = recommended_category.sub_category.all()
+        recommended_product= [
                 {
                     'is_new'           : product.is_new,
                     'english_name'     : product.english_name,
@@ -27,4 +27,4 @@ class RecommendList(View):
                 }
                 for sub_category in sub_categorys for product in list(sub_category.product.all())]
         
-        return JsonResponse({'recommend_product':recommend_product}, status=200)
+        return JsonResponse({'recommended_product':recommended_product}, status=200)
